@@ -10,8 +10,9 @@ const CustomTopicPage = () => {
   const [email, setEmail] = useState('');
   const [customTopic, setCustomTopic] = useState('');
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!email.trim() || !customTopic.trim()) {
@@ -19,10 +20,44 @@ const CustomTopicPage = () => {
       return;
     }
 
-    // Here you would typically send the data to your backend
-    // For now, we'll just show the success message
-    setIsSubmitted(true);
-    toast.success('Thank you for your request!');
+    if (!email.includes('@')) {
+      toast.error('Please enter a valid email address!');
+      return;
+    }
+
+    setIsLoading(true);
+    
+    try {
+      // Google Apps Script Web App URL from environment variable
+      const scriptURL = process.env.NEXT_PUBLIC_GOOGLE_SCRIPT_URL;
+      
+      if (!scriptURL) {
+        throw new Error('Google Script URL not configured');
+      }
+      
+      const formData = new FormData();
+      formData.append('email', email);
+      formData.append('topic', customTopic);
+      formData.append('timestamp', new Date().toISOString());
+      formData.append('type', 'custom_topic_request'); // To distinguish from waitlist entries
+      
+      const response = await fetch(scriptURL, {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (response.ok) {
+        setIsSubmitted(true);
+        toast.success('Thank you for your request! We\'ll review it and get back to you soon.');
+      } else {
+        throw new Error('Failed to submit request');
+      }
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      toast.error('There was an error submitting your request. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleBack = () => {
@@ -112,6 +147,7 @@ const CustomTopicPage = () => {
                   placeholder="your.email@example.com"
                   className="w-full p-3 rounded-lg bg-gray-800 border border-gray-600 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500"
                   required
+                  disabled={isLoading}
                 />
               </div>
 
@@ -126,14 +162,16 @@ const CustomTopicPage = () => {
                   placeholder="Describe the topic you'd like to practice (e.g., 'Advanced Calculus', 'Shakespeare's Sonnets', 'Machine Learning Algorithms')"
                   className="w-full h-32 p-3 rounded-lg bg-gray-800 border border-gray-600 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 resize-none"
                   required
+                  disabled={isLoading}
                 />
               </div>
 
               <Button
                 type="submit"
                 className="w-full h-14 text-lg font-semibold bg-violet-600 hover:bg-violet-700 transform hover:scale-105 transition-all duration-200 shadow-lg"
+                disabled={isLoading}
               >
-                Submit Request 📝
+                {isLoading ? 'Submitting...' : 'Submit Request 📝'}
               </Button>
             </form>
 
@@ -142,6 +180,7 @@ const CustomTopicPage = () => {
                 variant="outline"
                 onClick={() => window.location.href = '/practice'}
                 className="border-gray-600 text-gray-300 hover:bg-gray-800 hover:text-white"
+                disabled={isLoading}
               >
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Back to Practice
