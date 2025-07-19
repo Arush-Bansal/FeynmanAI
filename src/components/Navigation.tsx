@@ -3,12 +3,14 @@ import { Button } from "@/components/ui/button";
 import { Brain } from "lucide-react";
 import Link from 'next/link';
 import { GoogleLoginButton } from "./GoogleLoginButton";
+import { useSession } from "next-auth/react";
 
 interface NavigationProps {
   currentPage?: string;
 }
 
 export function Navigation({ currentPage }: NavigationProps) {
+  const { data: session } = useSession();
   const navItems = [
     { href: "/", label: "Home" },
   ];
@@ -27,8 +29,7 @@ export function Navigation({ currentPage }: NavigationProps) {
             <Link key={item.href} href={item.href}>
               <Button 
                 variant="ghost" 
-                className={`${
-                  currentPage === item.href 
+                className={`${currentPage === item.href 
                     ? 'text-white bg-gray-800' 
                     : 'text-gray-300 hover:text-white'
                 }`}
@@ -37,14 +38,16 @@ export function Navigation({ currentPage }: NavigationProps) {
               </Button>
             </Link>
           ))}
-          <Link href="/practice">
-            <Button className="bg-violet-600 hover:bg-violet-700">
-              Start Practice
-            </Button>
-          </Link>
+          {session && (
+            <Link href="/practice">
+              <Button className="bg-violet-600 hover:bg-violet-700">
+                Start Practice
+              </Button>
+            </Link>
+          )}
           <GoogleLoginButton />
         </div>
       </div>
     </nav>
   );
-} 
+}
