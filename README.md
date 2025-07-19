@@ -1,24 +1,44 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Feynman Technique Practice App
+
+A Next.js application that helps you practice the Feynman Technique. Record your explanations and practice explaining complex concepts in simple terms.
+
+## Features
+
+- **Topic Selection**: Choose from predefined topics or enter your own
+- **Voice Recording**: Record your explanations using speech-to-text
+- **Practice Flow**: Structured practice sessions with topic selection and recording
+- **Manual Review**: Review your own explanations and practice self-assessment
 
 ## Getting Started
 
-First, run the development server:
+### 1. Install dependencies
+
+```bash
+npm install
+```
+
+### 2. Run the development server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## How it Works
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. **Select a Topic**: Choose from science, math, history, literature, or business topics
+2. **Record Your Explanation**: Use the microphone to record your explanation of the concept
+3. **Review Your Explanation**: Listen back to your recording and practice self-assessment
+4. **Practice Self-Evaluation**: Use the Feynman Technique to evaluate your own explanation
+
+## Technology Stack
+
+- **Next.js 15** - React framework
+- **TypeScript** - Type safety
+- **Tailwind CSS** - Styling
+- **React Speech Recognition** - Voice recording
+- **Sonner** - Toast notifications
 
 ## Learn More
 
