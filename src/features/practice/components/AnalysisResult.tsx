@@ -2,6 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Brain, Sparkles, RotateCcw } from "lucide-react";
+import ReactMarkdown from 'react-markdown';
 
 interface AnalysisResultProps {
   topic: string;
@@ -24,8 +25,10 @@ export const AnalysisResult = ({ topic, analysis, onReset }: AnalysisResultProps
 
         {/* Analysis Results */}
         <div className="bg-gray-800/50 rounded-xl p-6 mb-8 border border-gray-700">
-          <div className="prose prose-invert max-w-none">
-            {analysis}
+          <div className="prose prose-invert max-w-none text-green-400">
+            <ReactMarkdown>
+              {analysis}
+            </ReactMarkdown>
           </div>
         </div>
 

@@ -3,7 +3,6 @@ import { useState, useEffect } from 'react';
 import { useSession } from "next-auth/react";
 import { useRouter } from 'next/navigation';
 import { toast } from "sonner";
-import { Navigation } from "@/components/Navigation";
 import {
   TopicSelection,
   RecordingInterface,
@@ -22,6 +21,7 @@ const PracticePage = () => {
   const [topic, setTopic] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [analysis, setAnalysis] = useState('');
+  const [selectedExamCategory, setSelectedExamCategory] = useState<string | null>(null);
   
   const { generateContent, isLoading: isGeminiLoading, error: geminiError, response: geminiResponse } = useGeminiGenerator();
 
@@ -38,6 +38,15 @@ const PracticePage = () => {
       router.push('/auth/signin');
     }
   }, [status, router]);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const storedCategory = localStorage.getItem('selectedExamCategory');
+      if (storedCategory) {
+        setSelectedExamCategory(storedCategory);
+      }
+    }
+  }, []);
 
   const handleTopicSubmit = () => {
     if (!topic.trim()) {
@@ -130,22 +139,14 @@ Focus on clarity, simplicity, and whether they could explain this to someone wit
   }
 
   return (
-    <div className="min-h-screen bg-gray-950 relative">
-      <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-gray-950 to-black opacity-90"></div>
-      <div className="absolute inset-0" style={{
-        backgroundImage: 'radial-gradient(circle at 25% 25%, rgba(139, 92, 246, 0.1) 0%, transparent 50%), radial-gradient(circle at 75% 75%, rgba(59, 130, 246, 0.1) 0%, transparent 50%)'
-      }}></div>
-
-      <div className="relative z-10 container mx-auto px-4 py-8 max-w-4xl">
-        <Navigation />
-
-        
-
+    <>
+    <div className="relative z-10 container mx-auto px-4 py-8 max-w-4xl">
         {currentStep === 'topic' && (
           <TopicSelection
             topic={topic}
             onTopicChange={setTopic}
             onTopicSubmit={handleTopicSubmit}
+            selectedExamCategory={selectedExamCategory}
           />
         )}
 
@@ -170,9 +171,7 @@ Focus on clarity, simplicity, and whether they could explain this to someone wit
           />
         )}
       </div>
-
-      
-    </div>
+    </>
   );
 };
 

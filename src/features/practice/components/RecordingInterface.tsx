@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Mic, Square, Send } from "lucide-react";
 
+
 interface RecordingInterfaceProps {
   topic: string;
   transcript: string;
@@ -11,7 +12,6 @@ interface RecordingInterfaceProps {
   onStartRecording: () => void;
   onStopRecording: () => void;
   onSubmitExplanation: (explanation: string) => void;
-  onChangeTopic: () => void;
 }
 
 export const RecordingInterface = ({
@@ -21,8 +21,7 @@ export const RecordingInterface = ({
   isProcessing,
   onStartRecording,
   onStopRecording,
-  onSubmitExplanation,
-  onChangeTopic
+  onSubmitExplanation
 }: RecordingInterfaceProps) => {
   const handleSubmit = () => {
     onSubmitExplanation(transcript);
@@ -81,16 +80,7 @@ export const RecordingInterface = ({
 
           {/* Action Buttons */}
           <div className="flex gap-4">
-            {/* {!isRecording && (
-              <Button
-                onClick={onChangeTopic}
-                variant="outline"
-                className="flex-1 h-12 bg-gray-800 border-gray-600 text-white hover:bg-gray-700"
-              >
-                <RotateCcw className="h-4 w-4 mr-2" />
-                Change Topic
-              </Button>
-            )} */}
+            
             <Button
               onClick={handleSubmit}
               disabled={!transcript.trim() || isProcessing}

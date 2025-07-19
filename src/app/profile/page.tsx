@@ -1,20 +1,37 @@
 "use client"
 import { useSession, signOut } from "next-auth/react";
 import { useRouter } from 'next/navigation';
-import { useEffect } from "react";
-import { Navigation } from "@/components/Navigation";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { LogOut } from "lucide-react";
+
+const EXAM_CATEGORIES = ['JEE', 'NEET', 'UPSC'];
 
 const ProfilePage = () => {
   const { data: session, status } = useSession();
   const router = useRouter();
+  const [selectedExam, setSelectedExam] = useState<string | null>(null);
 
   useEffect(() => {
     if (status === 'unauthenticated') {
       router.push('/auth/signin');
     }
   }, [status, router]);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const storedExam = localStorage.getItem('selectedExamCategory');
+      if (storedExam && EXAM_CATEGORIES.includes(storedExam)) {
+        setSelectedExam(storedExam);
+      }
+    }
+  }, []);
+
+  const handleExamSelect = (exam: string) => {
+    setSelectedExam(exam);
+    localStorage.setItem('selectedExamCategory', exam);
+  };
 
   if (status === 'loading' || !session) {
     return (
@@ -25,20 +42,12 @@ const ProfilePage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-950 relative">
-      <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-gray-950 to-black opacity-90"></div>
-      <div className="absolute inset-0" style={{
-        backgroundImage: 'radial-gradient(circle at 25% 25%, rgba(139, 92, 246, 0.1) 0%, transparent 50%), radial-gradient(circle at 75% 75%, rgba(59, 130, 246, 0.1) 0%, transparent 50%)'
-      }}></div>
-
-      <div className="relative z-10 container mx-auto px-4 py-8 max-w-4xl">
-        <Navigation />
-
-        <div className="text-center mb-12">
+    <>
+    <div className="text-center mb-12">
           <h1 className="text-5xl font-bold text-white">Profile</h1>
         </div>
 
-        <div className="bg-gray-900/50 border-gray-700 backdrop-blur-sm shadow-2xl rounded-lg p-8">
+        <div className="bg-gray-900/50 border-gray-700 backdrop-blur-sm shadow-2xl rounded-lg p-8 mb-8">
           <div className="flex items-center gap-6">
             {session.user?.image && (
               <img
@@ -53,16 +62,36 @@ const ProfilePage = () => {
               <Button
                 variant="outline"
                 onClick={() => signOut()}
-                className="mt-4 border-gray-600 text-white hover:bg-gray-800"
+                className="mt-4 border-gray-600 text-white hover:bg-gray-800 text-red-500 hover:text-white"
               >
-                <LogOut className="h-4 w-4 mr-2" />
+                <LogOut className="h-4 w-4 mr-2 text-red-500 hover:text-white" />
                 Sign Out
               </Button>
             </div>
           </div>
         </div>
-      </div>
-    </div>
+
+        <div className="bg-gray-900/50 border-gray-700 backdrop-blur-sm shadow-2xl rounded-lg p-8">
+          <h2 className="text-2xl font-bold text-white mb-4">Exam Preparation</h2>
+          <p className="text-gray-300 mb-4">Choose the exam you are preparing for:</p>
+          <div className="flex flex-wrap gap-3">
+            {EXAM_CATEGORIES.map((exam) => (
+              <Badge
+                key={exam}
+                variant={selectedExam === exam ? "default" : "secondary"}
+                className={`cursor-pointer text-lg px-4 py-2 ${
+                  selectedExam === exam 
+                    ? 'bg-violet-600 text-white' 
+                    : 'bg-gray-800 text-gray-300 hover:bg-gray-700 border-gray-600'
+                }`}
+                onClick={() => handleExamSelect(exam)}
+              >
+                {exam}
+              </Badge>
+            ))}
+          </div>
+        </div>
+        </>
   );
 };
 
