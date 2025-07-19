@@ -2,6 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { Brain } from "lucide-react";
 import Link from 'next/link';
+import { GoogleLoginButton } from "./GoogleLoginButton";
 
 interface NavigationProps {
   currentPage?: string;
@@ -10,7 +11,7 @@ interface NavigationProps {
 export function Navigation({ currentPage }: NavigationProps) {
   const navItems = [
     { href: "/", label: "Home" },
-    { href: "/about", label: "About" },
+    
     { href: "/dashboard", label: "Dashboard" },
   ];
 
@@ -43,6 +44,7 @@ export function Navigation({ currentPage }: NavigationProps) {
               Start Practice
             </Button>
           </Link>
+          <GoogleLoginButton />
         </div>
       </div>
     </nav>

@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Brain, Sparkles, TrendingUp, Calendar, Target, Award, ArrowRight, BarChart3, Clock, Star } from "lucide-react";
 import Link from 'next/link';
 import { Navigation } from "@/components/Navigation";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
 
 export default function Dashboard() {
   const [selectedTimeframe, setSelectedTimeframe] = useState<'week' | 'month' | 'year'>('week');
@@ -66,15 +67,16 @@ export default function Dashboard() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-950 relative">
-      {/* Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-gray-950 to-black opacity-90"></div>
-      <div className="absolute inset-0" style={{
-        backgroundImage: 'radial-gradient(circle at 25% 25%, rgba(139, 92, 246, 0.1) 0%, transparent 50%), radial-gradient(circle at 75% 75%, rgba(59, 130, 246, 0.1) 0%, transparent 50%)'
-      }}></div>
+    <ProtectedRoute>
+      <div className="min-h-screen bg-gray-950 relative">
+        {/* Background */}
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-gray-950 to-black opacity-90"></div>
+        <div className="absolute inset-0" style={{
+          backgroundImage: 'radial-gradient(circle at 25% 25%, rgba(139, 92, 246, 0.1) 0%, transparent 50%), radial-gradient(circle at 75% 75%, rgba(59, 130, 246, 0.1) 0%, transparent 50%)'
+        }}></div>
 
-      <div className="relative z-10">
-        <Navigation currentPage="/dashboard" />
+        <div className="relative z-10">
+          <Navigation currentPage="/dashboard" />
 
         {/* Header */}
         <div className="container mx-auto px-4 py-8">
@@ -254,5 +256,6 @@ export default function Dashboard() {
         </div>
       </div>
     </div>
+    </ProtectedRoute>
   );
 } 
