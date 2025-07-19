@@ -139,7 +139,7 @@ Focus on clarity, simplicity, and whether they could explain this to someone wit
       }}></div>
 
       <div className="relative z-10 container mx-auto px-4 py-8 max-w-4xl">
-        <Navigation currentPage="/practice" />
+        <Navigation />
 
         <PracticeHeader />
 

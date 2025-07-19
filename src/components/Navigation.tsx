@@ -5,15 +5,10 @@ import Link from 'next/link';
 import { GoogleLoginButton } from "./GoogleLoginButton";
 import { useSession } from "next-auth/react";
 
-interface NavigationProps {
-  currentPage?: string;
-}
 
-export function Navigation({ currentPage }: NavigationProps) {
+
+export function Navigation({}: NavigationProps) {
   const { data: session } = useSession();
-  const navItems = [
-    { href: "/", label: "Home" },
-  ];
 
   return (
     <nav className="container mx-auto px-4 py-6">
@@ -25,26 +20,8 @@ export function Navigation({ currentPage }: NavigationProps) {
           </span>
         </Link>
         <div className="flex items-center gap-4">
-          {navItems.map((item) => (
-            <Link key={item.href} href={item.href}>
-              <Button 
-                variant="ghost" 
-                className={`${currentPage === item.href 
-                    ? 'text-white bg-gray-800' 
-                    : 'text-gray-300 hover:text-white'
-                }`}
-              >
-                {item.label}
-              </Button>
-            </Link>
-          ))}
-          {session && (
-            <Link href="/practice">
-              <Button className="bg-violet-600 hover:bg-violet-700">
-                Start Practice
-              </Button>
-            </Link>
-          )}
+          
+          
           <GoogleLoginButton />
         </div>
       </div>

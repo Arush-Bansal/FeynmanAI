@@ -1,8 +1,8 @@
 "use client"
 
-import { signIn, signOut, useSession } from "next-auth/react"
+import { signIn, useSession } from "next-auth/react"
 import { Button } from "@/components/ui/button"
-import { LogIn, LogOut, User } from "lucide-react"
+import Link from "next/link";
 
 export function GoogleLoginButton() {
   const { data: session, status } = useSession()
@@ -18,28 +18,13 @@ export function GoogleLoginButton() {
 
   if (session) {
     return (
-      <div className="flex items-center gap-3">
-        <div className="flex items-center gap-2">
-          {session.user?.image && (
-            <img
-              src={session.user.image}
-              alt="Profile"
-              className="w-8 h-8 rounded-full"
-            />
-          )}
-          <span className="text-white hidden sm:inline">
-            {session.user?.name || session.user?.email}
-          </span>
-        </div>
-        <Button
-          variant="outline"
-          onClick={() => signOut()}
-          className="border-gray-600 text-white hover:bg-gray-800"
-        >
-          <LogOut className="h-4 w-4 mr-2" />
-          Sign Out
-        </Button>
-      </div>
+      <Link href="/profile">
+        <img
+          src={session.user?.image || ''}
+          alt="Profile"
+          className="w-8 h-8 rounded-full cursor-pointer"
+        />
+      </Link>
     )
   }
 
@@ -69,4 +54,4 @@ export function GoogleLoginButton() {
       Sign in with Google
     </Button>
   )
-} 
+}
