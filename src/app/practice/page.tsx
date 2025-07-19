@@ -1,5 +1,7 @@
 "use client"
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSession } from "next-auth/react";
+import { useRouter } from 'next/navigation';
 import { toast } from "sonner";
 import { Navigation } from "@/components/Navigation";
 import {
@@ -16,6 +18,8 @@ import { TOPIC_CONTENT } from '@/features/practice/constants';
 export type PracticeStep = 'topic' | 'recording' | 'result';
 
 const PracticePage = () => {
+  const { data: session, status } = useSession();
+  const router = useRouter();
   const [currentStep, setCurrentStep] = useState<PracticeStep>('topic');
   const [topic, setTopic] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
@@ -30,6 +34,12 @@ const PracticePage = () => {
     stopListening: stopRecording,
     resetTranscript
   } = useSpeechToText();
+
+  useEffect(() => {
+    if (status === 'unauthenticated') {
+      router.push('/auth/signin');
+    }
+  }, [status, router]);
 
   const handleTopicSubmit = () => {
     if (!topic.trim()) {
@@ -112,6 +122,14 @@ Focus on clarity, simplicity, and whether they could explain this to someone wit
     setCurrentStep('topic');
     resetTranscript();
   };
+
+  if (status === 'loading' || !session) {
+    return (
+      <div className="min-h-screen bg-gray-950 flex items-center justify-center">
+        <div className="text-white">Loading...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-950 relative">
