@@ -1,5 +1,4 @@
 "use client"
-import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Brain, Sparkles, Zap, ArrowRight, Target, Award } from "lucide-react";
@@ -9,7 +8,7 @@ import { useSession, signIn } from "next-auth/react";
 
 export default function Home() {
   const { data: session } = useSession();
-  const [activeFeature, setActiveFeature] = useState(0);
+  
 
   const features = [
     {
@@ -41,14 +40,7 @@ export default function Home() {
 
         <div className="container mx-auto px-4 py-16 text-center">
           <div className="max-w-4xl mx-auto">
-            <div className="flex items-center justify-center gap-3 mb-6">
-              <Brain className="h-12 w-12 text-violet-400" />
-              <h1 className="text-6xl font-bold bg-gradient-to-r from-violet-400 to-blue-400 bg-clip-text text-transparent">
-                Feynman
-              </h1>
-              <Sparkles className="h-10 w-10 text-blue-400" />
-            </div>
-            <p className="text-xl text-violet-300 mb-4">by Grifi</p>
+            
             <h2 className="text-4xl font-bold text-white mb-6">
               Master any concept by explaining it simply ✨
             </h2>

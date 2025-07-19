@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Mic, Square, RotateCcw, Send } from "lucide-react";
-import { toast } from "sonner";
+// import { toast } from "sonner";
 
 interface RecordingInterfaceProps {
   topic: string;
@@ -31,6 +31,7 @@ export const RecordingInterface = ({
   };
 
   return (
+    <>
     <Card className="bg-gray-900/50 border-gray-700 backdrop-blur-sm shadow-2xl">
       <CardContent className="p-8">
         <div className="text-center mb-8">
@@ -41,7 +42,7 @@ export const RecordingInterface = ({
         {/* Recording Interface */}
         <div className="space-y-8">
           {/* Mic Button */}
-          <div className="text-center">
+          <div className="flex flex-col items-center justify-center">
             <button
               onMouseDown={onStartRecording}
               onMouseUp={onStopRecording}
@@ -82,18 +83,20 @@ export const RecordingInterface = ({
 
           {/* Action Buttons */}
           <div className="flex gap-4">
-            <Button
-              onClick={onChangeTopic}
-              variant="outline"
-              className="flex-1 h-12 bg-gray-800 border-gray-600 text-white hover:bg-gray-700"
-            >
-              <RotateCcw className="h-4 w-4 mr-2" />
-              Change Topic
-            </Button>
+            {!isRecording && (
+              <Button
+                onClick={onChangeTopic}
+                variant="outline"
+                className="flex-1 h-12 bg-gray-800 border-gray-600 text-white hover:bg-gray-700"
+              >
+                <RotateCcw className="h-4 w-4 mr-2" />
+                Change Topic
+              </Button>
+            )}
             <Button
               onClick={handleSubmit}
               disabled={!transcript.trim() || isProcessing}
-              className="flex-1 h-12 bg-green-600 hover:bg-green-700 disabled:opacity-50"
+              className={`${!isRecording ? 'flex-1' : 'w-full'} h-12 bg-green-600 hover:bg-green-700 disabled:opacity-50`}
             >
               {isProcessing ? (
                 <>
@@ -111,5 +114,13 @@ export const RecordingInterface = ({
         </div>
       </CardContent>
     </Card>
+    {isRecording && (
+      <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 z-20">
+        <Badge variant="secondary" className="bg-gray-800/80 text-white border-gray-600 backdrop-blur-sm">
+          Press and hold Spacebar to record
+        </Badge>
+      </div>
+    )}
+    </>
   );
 }; 

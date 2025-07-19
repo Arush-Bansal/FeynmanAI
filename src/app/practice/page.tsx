@@ -7,9 +7,7 @@ import { Navigation } from "@/components/Navigation";
 import {
   TopicSelection,
   RecordingInterface,
-  AnalysisResult,
-  PracticeHeader,
-  SpacebarHint
+  AnalysisResult
 } from "@/features/practice/components";
 import { useSpeechToText } from "@/features/speech-recognition/useSpeechToText";
 import { useGeminiGenerator } from '@/features/gemini/useGeminiGenerator';
@@ -141,7 +139,7 @@ Focus on clarity, simplicity, and whether they could explain this to someone wit
       <div className="relative z-10 container mx-auto px-4 py-8 max-w-4xl">
         <Navigation />
 
-        <PracticeHeader />
+        
 
         {currentStep === 'topic' && (
           <TopicSelection
@@ -173,7 +171,7 @@ Focus on clarity, simplicity, and whether they could explain this to someone wit
         )}
       </div>
 
-      <SpacebarHint isVisible={currentStep === 'recording'} />
+      
     </div>
   );
 };
