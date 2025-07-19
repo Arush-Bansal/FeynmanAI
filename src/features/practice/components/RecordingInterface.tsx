@@ -1,9 +1,7 @@
 "use client"
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Mic, Square, RotateCcw, Send } from "lucide-react";
-// import { toast } from "sonner";
+import { Mic, Square, Send } from "lucide-react";
 
 interface RecordingInterfaceProps {
   topic: string;
@@ -83,7 +81,7 @@ export const RecordingInterface = ({
 
           {/* Action Buttons */}
           <div className="flex gap-4">
-            {!isRecording && (
+            {/* {!isRecording && (
               <Button
                 onClick={onChangeTopic}
                 variant="outline"
@@ -92,11 +90,11 @@ export const RecordingInterface = ({
                 <RotateCcw className="h-4 w-4 mr-2" />
                 Change Topic
               </Button>
-            )}
+            )} */}
             <Button
               onClick={handleSubmit}
               disabled={!transcript.trim() || isProcessing}
-              className={`${!isRecording ? 'flex-1' : 'w-full'} h-12 bg-green-600 hover:bg-green-700 disabled:opacity-50`}
+              className={`w-full h-12 bg-green-600 hover:bg-green-700 disabled:opacity-50`}
             >
               {isProcessing ? (
                 <>
@@ -114,13 +112,6 @@ export const RecordingInterface = ({
         </div>
       </CardContent>
     </Card>
-    {isRecording && (
-      <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 z-20">
-        <Badge variant="secondary" className="bg-gray-800/80 text-white border-gray-600 backdrop-blur-sm">
-          Press and hold Spacebar to record
-        </Badge>
-      </div>
-    )}
     </>
   );
 }; 
