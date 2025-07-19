@@ -11,8 +11,6 @@ interface NavigationProps {
 export function Navigation({ currentPage }: NavigationProps) {
   const navItems = [
     { href: "/", label: "Home" },
-    
-    { href: "/dashboard", label: "Dashboard" },
   ];
 
   return (
