@@ -3,7 +3,8 @@
 import { useSession } from "next-auth/react"
 import { useRouter, usePathname } from "next/navigation"
 import { useEffect, useState } from "react"
-import { getRouteConfig, getSelectedExam } from "@/lib/routeConfig"
+import { getRouteConfig } from "@/lib/routeConfig"
+import { getSelectedExam } from "@/lib/utils"
 
 export function useRouteGuard() {
   const { data: session, status } = useSession()

@@ -1,6 +1,5 @@
 "use client"
 import { useState, useEffect } from 'react';
-import { useSession } from "next-auth/react";
 import { toast } from "sonner";
 import {
   TopicSelection,
@@ -9,14 +8,13 @@ import {
 } from "@/features/practice/components";
 import { useSpeechToText } from "@/features/speech-recognition/useSpeechToText";
 import { useGeminiGenerator } from '@/features/gemini/useGeminiGenerator';
-import { TOPIC_CONTENT } from '@/features/practice/constants';
 import { AuthLayout } from "@/components/AuthLayout";
-import { getSelectedExam } from "@/lib/routeConfig";
+import { getSelectedExam } from "@/lib/utils";
+
 
 export type PracticeStep = 'topic' | 'recording' | 'result';
 
 const PracticePage = () => {
-  const { data: session } = useSession();
   const [currentStep, setCurrentStep] = useState<PracticeStep>('topic');
   const [topic, setTopic] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);

@@ -1,10 +1,10 @@
 "use client"
 
 import { useSession } from "next-auth/react"
-import { useRouter, usePathname } from "next/navigation"
+import { useRouter } from "next/navigation"
 import { useEffect } from "react"
 import { ReactNode } from "react"
-import { getRouteConfig, getSelectedExam } from "@/lib/routeConfig"
+import { getSelectedExam } from "@/lib/utils"
 
 interface ProtectedRouteProps {
   children: ReactNode
@@ -25,7 +25,6 @@ export function ProtectedRoute({
 }: ProtectedRouteProps) {
   const { data: session, status } = useSession()
   const router = useRouter()
-  const pathname = usePathname()
 
   useEffect(() => {
     // Check authentication first
