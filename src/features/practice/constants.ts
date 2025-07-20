@@ -11,54 +11,25 @@ export const PREDEFINED_TOPICS = {
     'Physics': [
       'Mechanics & Motion',
       'Electromagnetic Induction',
-      'Wave Optics',
-      'Thermodynamics',
-      'Electrostatics',
     ],
     'Chemistry': [
       'Organic Chemistry Reactions',
       'Chemical Bonding',
-      'Coordination Chemistry',
     ],
     'Mathematics': [
       'Calculus & Integration',
-      'Vector Algebra',
     ],
   },
   'NEET': {
     'Physics': [
       'NEET Physics Topic 1',
-      'NEET Physics Topic 2',
     ],
     'Chemistry': [
       'NEET Chemistry Topic 1',
-      'NEET Chemistry Topic 2',
     ],
     'Biology': [
       'Human Physiology',
       'Cell Biology',
-      'Genetics & Inheritance',
-      'Ecology & Environment',
-      'Plant Anatomy',
-      'Biochemistry',
-      'Evolution',
-      'Microbiology',
-      'Immunology',
-      'Neurobiology',
-    ],
-  },
-  'UPSC': {
-    'General Studies': [
-      'Indian Constitution',
-      'Indian Economy',
-      'Geography of India',
-      'Modern Indian History',
-      'International Relations',
-      'Environmental Issues',
-      'Science & Technology',
-      'Social Issues',
-      'Governance & Polity',
-      'Agriculture & Rural Development',
     ],
   },
 } as const;

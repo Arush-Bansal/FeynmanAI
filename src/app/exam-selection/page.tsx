@@ -46,15 +46,7 @@ const ExamSelectionPage = () => {
           <p className="text-lg mt-2">Medical Entrance</p>
         </div>
 
-        {/* UPSC Block */}
-        <div
-          className="flex-1 flex flex-col items-center justify-center bg-gradient-to-br from-purple-700 to-purple-900 text-white cursor-pointer transition-all duration-300 hover:scale-[1.01] shadow-lg"
-          onClick={() => handleExamSelect('UPSC')}
-        >
-          <Image src="/images/upsc-icon.svg" alt="UPSC Icon" width={120} height={120} className="mb-4" />
-          <h2 className="text-4xl font-bold">UPSC</h2>
-          <p className="text-lg mt-2">Civil Services</p>
-        </div>
+        
       </div>
     </AuthLayout>
   );
