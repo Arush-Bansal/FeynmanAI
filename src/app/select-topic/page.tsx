@@ -1,60 +1,53 @@
 "use client"
 
+import { useState, useEffect } from 'react';
+import { toast } from "sonner";
+import { useRouter } from 'next/navigation';
+import { TOPIC_CONTENT } from '@/features/content-library/constants';
 import { Button } from "@/components/ui/button";
 import { Zap, BookOpen, GraduationCap } from "lucide-react";
-import { toast } from "sonner";
-import { PREDEFINED_TOPICS } from "@/features/content-library";
-import { useState, useEffect } from "react";
 
-interface TopicSelectionProps {
-  topic: string;
-  onTopicChange: (topic: string) => void;
-  onTopicSubmit: () => void;
-  selectedExamCategory: string | null;
-}
-
-export const TopicSelection = ({
-  topic,
-  onTopicChange,
-  onTopicSubmit,
-  selectedExamCategory,
-}: TopicSelectionProps) => {
-  const [selectedExam, setSelectedExam] = useState<string | null>(null);
+const SelectTopicPage = () => {
+  const [topic, setTopic] = useState('');
+  const [selectedExamCategory, setSelectedExamCategory] = useState<string | null>(null);
   const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
-    console.log('TopicSelection - selectedExamCategory:', selectedExamCategory);
-    if (selectedExamCategory) {
-      setSelectedExam(selectedExamCategory);
+    if (typeof window !== 'undefined') {
+      const storedCategory = localStorage.getItem('selectedExamCategory');
+      if (storedCategory) {
+        setSelectedExamCategory(storedCategory);
+      }
     }
-  }, [selectedExamCategory]);
+  }, []);
 
-  const handleSubmit = () => {
-    if (!topic.trim()) {
-      toast.error('Please select a topic to practice!');
+  const handleTopicSubmit = () => {
+    if (!topic.trim() || !selectedExamCategory || !selectedSubject) {
+      toast.error('Please select an exam, subject, and topic to practice!');
       return;
     }
-    onTopicSubmit();
+    router.push(`/practice?exam=${selectedExamCategory}&subject=${selectedSubject}&topic=${topic}`);
   };
 
   const handleTopicSelect = (selectedTopic: string) => {
-    onTopicChange(selectedTopic);
+    setTopic(selectedTopic);
   };
 
   const handleSubjectSelect = (subject: string) => {
     setSelectedSubject(subject);
-    onTopicChange(''); // Clear selected topic when subject changes
+    setTopic(''); // Clear selected topic when subject changes
   };
 
   const handleExamSelect = (exam: string) => {
-    setSelectedExam(exam);
+    setSelectedExamCategory(exam);
     setSelectedSubject(null); // Clear selected subject when exam changes
-    onTopicChange(''); // Clear selected topic when exam changes
+    setTopic(''); // Clear selected topic when exam changes
   };
 
-  const exams = Object.keys(PREDEFINED_TOPICS);
-  const subjects = selectedExam ? Object.keys(PREDEFINED_TOPICS[selectedExam as keyof typeof PREDEFINED_TOPICS]) : [];
-  const topics = (selectedExam && selectedSubject) ? PREDEFINED_TOPICS[selectedExam as keyof typeof PREDEFINED_TOPICS][selectedSubject as keyof (typeof PREDEFINED_TOPICS)[keyof typeof PREDEFINED_TOPICS]] : [];
+  const exams = Object.keys(TOPIC_CONTENT);
+  const subjects = selectedExamCategory ? Object.keys(TOPIC_CONTENT[selectedExamCategory as keyof typeof TOPIC_CONTENT]) : [];
+  const topics = (selectedExamCategory && selectedSubject) ? Object.keys(TOPIC_CONTENT[selectedExamCategory as keyof typeof TOPIC_CONTENT][selectedSubject as keyof (typeof TOPIC_CONTENT)[keyof typeof TOPIC_CONTENT]]) : [];
 
   return (
     <div className="w-full px-4 md:px-8 py-8">
@@ -77,7 +70,7 @@ export const TopicSelection = ({
                 key={examName}
                 variant="outline"
                 className={`w-full h-auto py-2 px-3 text-left text-lg font-semibold rounded-lg transition-all duration-200 ease-in-out transform hover:scale-105
-                  ${selectedExam === examName
+                  ${selectedExamCategory === examName
                     ? 'bg-violet-600 text-white border-violet-600 shadow-lg'
                     : 'bg-gray-800 text-gray-200 border-gray-700 hover:bg-gray-700 hover:border-gray-600'
                   }`}
@@ -91,11 +84,11 @@ export const TopicSelection = ({
       )}
 
       {/* Subject Selection Section */}
-      {selectedExam && (
+      {selectedExamCategory && (
         <div className="mb-8">
           <div className="flex items-center gap-2 mb-4">
             <BookOpen className="h-5 w-5 text-violet-400" />
-            <h3 className="text-xl font-semibold text-white">Choose Your Subject for {selectedExam}</h3>
+            <h3 className="text-xl font-semibold text-white">Choose Your Subject for {selectedExamCategory}</h3>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
             {subjects.map((subjectName) => (
@@ -117,7 +110,7 @@ export const TopicSelection = ({
       )}
 
       {/* Topic Selection Section */}
-      {selectedExam && selectedSubject && (
+      {selectedExamCategory && selectedSubject && (
         <div className="mb-8">
           <div className="flex items-center gap-2 mb-4">
             <BookOpen className="h-5 w-5 text-violet-400" />
@@ -147,10 +140,10 @@ export const TopicSelection = ({
         </div>
       )}
 
-      {!selectedExam && (
+      {!selectedExamCategory && (
         <p className="text-gray-400 text-left">Please select an exam to see subjects.</p>
       )}
-      {!selectedSubject && selectedExam && (
+      {!selectedSubject && selectedExamCategory && (
         <p className="text-gray-400 text-left">Please select a subject to see topics.</p>
       )}
 
@@ -167,8 +160,8 @@ export const TopicSelection = ({
       
       <div className="flex justify-end">
         <Button 
-          onClick={handleSubmit}
-          disabled={!topic.trim() || !selectedExam || !selectedSubject}
+          onClick={handleTopicSubmit}
+          disabled={!topic.trim() || !selectedExamCategory || !selectedSubject}
           className="w-full sm:w-auto h-14 text-lg font-semibold bg-violet-600 hover:bg-violet-700 transform hover:scale-105 transition-all duration-200 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Let&apos;s Practice! 🚀
@@ -182,3 +175,5 @@ export const TopicSelection = ({
     </div>
   );
 };
+
+export default SelectTopicPage;

@@ -28,11 +28,11 @@ export const useGeminiGenerator = () => {
       
       const data = await res.json();
       setResponse(data.response || "");
-      
+      return data.response; // Return the response directly
     } catch (e) {
       setError(`Failed to generate content. Please try again later. ${e}`);
       setResponse(null);
-      
+      return null; // Return null on error
     } finally {
       setIsLoading(false);
     }

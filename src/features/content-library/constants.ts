@@ -1,4 +1,17 @@
-export const TOPIC_CONTENT = {
+interface TopicContent {
+  keyPoints: string[];
+  concepts: string;
+}
+
+interface ExamContent { 
+  [key: string]: TopicContent;
+}
+
+interface SubjectContent {
+  [key: string]: ExamContent;
+}
+
+export const TOPIC_CONTENT : Record<string, SubjectContent> = {
   'JEE': {
     'Physics': {
       'Mechanics & Motion': {
@@ -131,6 +144,9 @@ for (const exam in TOPIC_CONTENT) {
   }
 }
 
-export const PREDEFINED_TOPICS = predefinedTopicsData;
 
-export const MOCK_ANALYSIS_TEMPLATE = (topic: string) => `## Great explanation of ${topic}! \n\n### ✅ **Strengths:**\n- Clear conceptual understanding\n- Good use of examples  \n-Logical flow of ideas\n\n### 🔄 **Areas to improve:**\n- Could elaborate more on the underlying principles\n- Consider adding real-world applications\n- Try to explain it even more simply\n\n### 💡 **Tip:** \nRemember the Feynman Technique - if you can\'t explain it simply, you don\'t understand it well enough!\n\n**Keep practicing and you\'ll master this topic! 🚀**`;
+export const PREDEFINED_TOPICS = Object.values(TOPIC_CONTENT).flatMap(exam => 
+  Object.values(exam).flatMap(subject => 
+    Object.values(subject).map((topic) => topic.keyPoints)
+  )
+);
