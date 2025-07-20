@@ -19,6 +19,7 @@ export function GoogleLoginButton() {
   if (session) {
     return (
       <Link href="/profile">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={session.user?.image || ''}
           alt="Profile"

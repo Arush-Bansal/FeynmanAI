@@ -30,7 +30,7 @@ export const useGeminiGenerator = () => {
       setResponse(data.response || "");
       
     } catch (e) {
-      setError("Failed to generate content. Please try again later.");
+      setError(`Failed to generate content. Please try again later. ${e}`);
       setResponse(null);
       
     } finally {

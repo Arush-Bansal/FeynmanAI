@@ -50,6 +50,7 @@ const ProfilePage = () => {
         <div className="bg-gray-900/50 border-gray-700 backdrop-blur-sm shadow-2xl rounded-lg p-8 mb-8">
           <div className="flex items-center gap-6">
             {session.user?.image && (
+              // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={session.user.image}
                 alt="Profile"

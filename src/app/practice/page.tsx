@@ -69,10 +69,10 @@ const PracticePage = () => {
 **Expected Topic Content for "${topic}":**
 
 **Key Concepts to Cover:**
-${topicContent.concepts}
+${Object.keys(topicContent).map(key => `- ${key}`).join('\n')}
 
 **Key Points that should be mentioned:**
-${topicContent.keyPoints.map(point => `- ${point}`).join('\n')}
+${Object.values(topicContent).map(value => `- ${value}`).join('\n')}
 
 **Analysis Guidelines:**
 Please evaluate whether the user's explanation covers these key points and concepts.`;
@@ -125,10 +125,10 @@ Focus on clarity, simplicity, and whether they could explain this to someone wit
     resetTranscript();
   };
 
-  const goBackToTopic = () => {
-    setCurrentStep('topic');
-    resetTranscript();
-  };
+  // const goBackToTopic = () => {
+  //   setCurrentStep('topic');
+  //   resetTranscript();
+  // };
 
   if (status === 'loading' || !session) {
     return (
@@ -159,7 +159,7 @@ Focus on clarity, simplicity, and whether they could explain this to someone wit
             onStartRecording={startRecording}
             onStopRecording={stopRecording}
             onSubmitExplanation={handleSubmitExplanation}
-            onChangeTopic={goBackToTopic}
+            // onChangeTopic={goBackToTopic}
           />
         )}
 
