@@ -55,7 +55,7 @@ This guide will help you set up Google OAuth authentication for your Feynman app
 2. Update `.env.local` with your credentials:
    ```env
    # Gemini AI API Key
-   GEMINI_API_KEY=your-gemini-api-key-here
+   GEMINI_API_KEY=your-GEMINI_API_KEY-here
 
    # NextAuth Configuration
    NEXTAUTH_URL=http://localhost:3000
