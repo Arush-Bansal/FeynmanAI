@@ -1,7 +1,6 @@
 "use client"
 import { useState, useEffect } from 'react';
 import { useSession } from "next-auth/react";
-import { useRouter } from 'next/navigation';
 import { toast } from "sonner";
 import {
   TopicSelection,
@@ -11,12 +10,13 @@ import {
 import { useSpeechToText } from "@/features/speech-recognition/useSpeechToText";
 import { useGeminiGenerator } from '@/features/gemini/useGeminiGenerator';
 import { TOPIC_CONTENT } from '@/features/practice/constants';
+import { AuthLayout } from "@/components/AuthLayout";
+import { getSelectedExam } from "@/lib/routeConfig";
 
 export type PracticeStep = 'topic' | 'recording' | 'result';
 
 const PracticePage = () => {
-  const { data: session, status } = useSession();
-  const router = useRouter();
+  const { data: session } = useSession();
   const [currentStep, setCurrentStep] = useState<PracticeStep>('topic');
   const [topic, setTopic] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
@@ -32,12 +32,6 @@ const PracticePage = () => {
     stopListening: stopRecording,
     resetTranscript
   } = useSpeechToText();
-
-  useEffect(() => {
-    if (status === 'unauthenticated') {
-      router.push('/auth/signin');
-    }
-  }, [status, router]);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -56,60 +50,41 @@ const PracticePage = () => {
     setCurrentStep('recording');
   };
 
-  const handleSubmitExplanation = async (explanation: string) => {
+  const handleSubmitExplanation = async () => {
+    if (!transcript.trim()) {
+      toast.error('Please record your explanation first!');
+      return;
+    }
+
     setIsProcessing(true);
-    
+    setCurrentStep('result');
+
     try {
-      const topicContent = TOPIC_CONTENT[topic as keyof typeof TOPIC_CONTENT];
+      const selectedExam = getSelectedExam();
+      const examContext = selectedExam ? `for ${selectedExam} preparation` : '';
       
-      let topicContext = '';
-      if (topicContent) {
-        topicContext = `
+      const prompt = `You are an expert teacher using the Feynman Technique. Analyze this student's explanation of "${topic}" ${examContext}:
 
-**Expected Topic Content for "${topic}":**
+Student's explanation: "${transcript}"
 
-**Key Concepts to Cover:**
-${Object.keys(topicContent).map(key => `- ${key}`).join('\n')}
+Please provide:
+1. **Strengths** (what they explained well)
+2. **Areas for Improvement** (what was unclear or missing)
+3. **Specific Feedback** (concrete suggestions to improve their understanding)
+4. **Key Concepts** they should focus on
+5. **A simple explanation** of the topic to help them understand better
 
-**Key Points that should be mentioned:**
-${Object.values(topicContent).map(value => `- ${value}`).join('\n')}
-
-**Analysis Guidelines:**
-Please evaluate whether the user's explanation covers these key points and concepts.`;
-      }
-
-      const prompt = `Analyze this explanation of "${topic}" using the Feynman Technique principles. The user's explanation is:
-
-"${explanation}"${topicContext}
-
-Please provide a comprehensive analysis in markdown format with the following sections:
-
-1. **Strengths** - What they did well overall
-
-2. **Key Points Analysis** - Go through each key point and provide specific feedback:
-   - For each key point, state whether they covered it or not
-   - If covered: Rate their explanation (Excellent/Good/Needs Improvement) and provide brief feedback
-   - If missed: Explain what this concept is and how they could include it simply
-
-3. **Areas to improve** - Specific suggestions for better explanation
-
-4. **Tips** - How to apply the Feynman Technique better
-
-5. **Overall feedback** - Encouraging summary with a score (e.g., "You covered 6 out of 8 key points")
-
-Focus on clarity, simplicity, and whether they could explain this to someone with no background in the topic. For each key point they missed, provide a simple explanation of what that concept is so they can include it next time.`;
+Keep your response encouraging and constructive. Focus on helping them understand the concept better.`;
 
       await generateContent(prompt);
       
-      if (geminiError) {
-        throw new Error(geminiError);
-      }
-      
       if (geminiResponse) {
         setAnalysis(geminiResponse);
-        setCurrentStep('result');
+      } else if (geminiError) {
+        throw new Error(geminiError);
+      } else {
+        throw new Error('Failed to generate analysis');
       }
-      
     } catch (error) {
       console.error('Analysis error:', error);
       toast.error('Failed to analyze your explanation. Please try again.');
@@ -125,22 +100,9 @@ Focus on clarity, simplicity, and whether they could explain this to someone wit
     resetTranscript();
   };
 
-  // const goBackToTopic = () => {
-  //   setCurrentStep('topic');
-  //   resetTranscript();
-  // };
-
-  if (status === 'loading' || !session) {
-    return (
-      <div className="min-h-screen bg-gray-950 flex items-center justify-center">
-        <div className="text-white">Loading...</div>
-      </div>
-    );
-  }
-
   return (
-    <>
-    <div className="relative z-10 container mx-auto px-4 py-8 max-w-4xl">
+    <AuthLayout requireAuth={true} requireExamSelection={true}>
+      <div className="relative z-10 container mx-auto px-4 py-8 max-w-4xl">
         {currentStep === 'topic' && (
           <TopicSelection
             topic={topic}
@@ -159,7 +121,6 @@ Focus on clarity, simplicity, and whether they could explain this to someone wit
             onStartRecording={startRecording}
             onStopRecording={stopRecording}
             onSubmitExplanation={handleSubmitExplanation}
-            // onChangeTopic={goBackToTopic}
           />
         )}
 
@@ -171,7 +132,7 @@ Focus on clarity, simplicity, and whether they could explain this to someone wit
           />
         )}
       </div>
-    </>
+    </AuthLayout>
   );
 };
 
