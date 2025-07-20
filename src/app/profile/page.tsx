@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { LogOut } from "lucide-react";
 
-import { TOPIC_CONTENT } from "@/features/practice/constants";
+import { TOPIC_CONTENT } from "@/features/content-library";
 
 const ProfilePage = () => {
   const { data: session } = useSession();

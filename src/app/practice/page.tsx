@@ -7,7 +7,7 @@ import {
   AnalysisResult
 } from "@/features/practice/components";
 import { useSpeechToText } from "@/features/speech-recognition/useSpeechToText";
-import { useGeminiGenerator } from '@/features/gemini/useGeminiGenerator';
+import { useGeminiGenerator } from '@/features/gemini';
 
 import { getSelectedExam } from "@/lib/utils";
 

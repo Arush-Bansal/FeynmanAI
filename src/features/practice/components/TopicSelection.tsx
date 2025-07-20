@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Zap, BookOpen, GraduationCap } from "lucide-react";
 import { toast } from "sonner";
-import { PREDEFINED_TOPICS } from "../constants";
+import { PREDEFINED_TOPICS } from "@/features/content-library";
 import { useState, useEffect } from "react";
 
 interface TopicSelectionProps {

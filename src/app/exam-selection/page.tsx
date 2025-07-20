@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import Image from 'next/image';
 
-import { TOPIC_CONTENT } from '@/features/practice/constants';
+import { TOPIC_CONTENT } from '@/features/content-library';
 
 const ExamSelectionPage = () => {
   const router = useRouter();
