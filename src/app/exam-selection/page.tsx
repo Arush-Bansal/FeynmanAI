@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import Image from 'next/image';
 import { AuthLayout } from "@/components/AuthLayout";
+import { TOPIC_CONTENT } from '@/features/practice/constants';
 
 const ExamSelectionPage = () => {
   const router = useRouter();
@@ -23,30 +24,48 @@ const ExamSelectionPage = () => {
     }
   }, []);
 
+  const examCategories = Object.keys(TOPIC_CONTENT);
+
+  const getExamConfig = (exam: string) => {
+    switch (exam) {
+      case 'JEE':
+        return {
+          icon: '/images/jee-icon.svg',
+          gradient: 'from-blue-700 to-blue-900',
+          description: 'Engineering Entrance',
+        };
+      case 'NEET':
+        return {
+          icon: '/images/neet-icon.svg',
+          gradient: 'from-green-700 to-green-900',
+          description: 'Medical Entrance',
+        };
+      default:
+        return {
+          icon: '/images/default-icon.svg',
+          gradient: 'from-gray-700 to-gray-900',
+          description: 'Exam',
+        };
+    }
+  };
+
   return (
     <AuthLayout requireAuth={false}>
       <div className="flex flex-col h-screen w-full">
-        {/* JEE Block */}
-        <div
-          className="flex-1 flex flex-col items-center justify-center bg-gradient-to-br from-blue-700 to-blue-900 text-white cursor-pointer transition-all duration-300 hover:scale-[1.01] shadow-lg"
-          onClick={() => handleExamSelect('JEE')}
-        >
-          <Image src="/images/jee-icon.svg" alt="JEE Icon" width={120} height={120} className="mb-4" />
-          <h2 className="text-4xl font-bold">JEE</h2>
-          <p className="text-lg mt-2">Engineering Entrance</p>
-        </div>
-
-        {/* NEET Block */}
-        <div
-          className="flex-1 flex flex-col items-center justify-center bg-gradient-to-br from-green-700 to-green-900 text-white cursor-pointer transition-all duration-300 hover:scale-[1.01] shadow-lg"
-          onClick={() => handleExamSelect('NEET')}
-        >
-          <Image src="/images/neet-icon.svg" alt="NEET Icon" width={120} height={120} className="mb-4" />
-          <h2 className="text-4xl font-bold">NEET</h2>
-          <p className="text-lg mt-2">Medical Entrance</p>
-        </div>
-
-        
+        {examCategories.map((exam) => {
+          const config = getExamConfig(exam);
+          return (
+            <div
+              key={exam}
+              className={`flex-1 flex flex-col items-center justify-center bg-gradient-to-br ${config.gradient} text-white cursor-pointer transition-all duration-300 hover:scale-[1.01] shadow-lg`}
+              onClick={() => handleExamSelect(exam)}
+            >
+              <Image src={config.icon} alt={`${exam} Icon`} width={120} height={120} className="mb-4" />
+              <h2 className="text-4xl font-bold">{exam}</h2>
+              <p className="text-lg mt-2">{config.description}</p>
+            </div>
+          );
+        })}
       </div>
     </AuthLayout>
   );

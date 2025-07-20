@@ -21,10 +21,4 @@ export function getRouteConfig(pathname: string): RouteConfig | undefined {
   return ROUTE_CONFIG.find(config => config.path === pathname);
 }
 
-export const EXAM_CATEGORIES = ['JEE', 'NEET', 'UPSC'];
-
-export function getSelectedExam(): string | null {
-  if (typeof window === 'undefined') return null;
-  const storedExam = localStorage.getItem('selectedExamCategory');
-  return storedExam && EXAM_CATEGORIES.includes(storedExam) ? storedExam : null;
-} 
+ 

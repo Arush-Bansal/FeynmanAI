@@ -5,11 +5,12 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { LogOut } from "lucide-react";
 import { AuthLayout } from "@/components/AuthLayout";
-import { EXAM_CATEGORIES } from "@/lib/routeConfig";
+import { TOPIC_CONTENT } from "@/features/practice/constants";
 
 const ProfilePage = () => {
   const { data: session } = useSession();
   const [selectedExam, setSelectedExam] = useState<string | null>(null);
+  const EXAM_CATEGORIES = Object.keys(TOPIC_CONTENT);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -18,7 +19,7 @@ const ProfilePage = () => {
         setSelectedExam(storedExam);
       }
     }
-  }, []);
+  }, [EXAM_CATEGORIES]);
 
   const handleExamSelect = (exam: string) => {
     setSelectedExam(exam);
