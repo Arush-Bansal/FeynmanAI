@@ -54,7 +54,7 @@ export const TopicSelection = ({
 
   const exams = Object.keys(PREDEFINED_TOPICS);
   const subjects = selectedExam ? Object.keys(PREDEFINED_TOPICS[selectedExam as keyof typeof PREDEFINED_TOPICS]) : [];
-  const topics = (selectedExam && selectedSubject) ? PREDEFINED_TOPICS[selectedExam as keyof typeof PREDEFINED_TOPICS][selectedSubject as keyof typeof PREDEFINED_TOPICS[string]] : [];
+  const topics = (selectedExam && selectedSubject) ? PREDEFINED_TOPICS[selectedExam as keyof typeof PREDEFINED_TOPICS][selectedSubject as keyof (typeof PREDEFINED_TOPICS)[keyof typeof PREDEFINED_TOPICS]] : [];
 
   return (
     <div className="w-full px-4 md:px-8 py-8">
@@ -128,7 +128,7 @@ export const TopicSelection = ({
           <div className="mb-6">
             <label className="block text-sm font-medium text-gray-300 mb-3">Select Topic:</label>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4">
-              {topics.map((topicName) => (
+              {topics.map((topicName: string) => (
                 <Button
                   key={topicName}
                   variant="outline"
@@ -181,3 +181,4 @@ export const TopicSelection = ({
       </div>
     </div>
   );
+};

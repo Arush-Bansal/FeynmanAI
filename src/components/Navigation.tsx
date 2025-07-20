@@ -2,9 +2,8 @@
 import { Brain } from "lucide-react";
 import Link from 'next/link';
 import { GoogleLoginButton } from "./GoogleLoginButton";
-import { useSession } from "next-auth/react";
 
-export function Navigation({}) {
+export function Navigation() {
 
   return (
     <nav className="container mx-auto px-4 py-6">

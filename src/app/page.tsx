@@ -94,7 +94,7 @@ export default function Home() {
                   <Card 
                     key={index}
                     className="bg-gray-900/50 border-gray-700 backdrop-blur-sm hover:bg-gray-900/70 transition-all duration-300 cursor-pointer"
-                    onClick={() => setActiveFeature(index)}
+                    // onClick={() => setActiveFeature(index)}
                   >
                     <CardContent className="p-6 text-center">
                       <div className="flex justify-center mb-4">

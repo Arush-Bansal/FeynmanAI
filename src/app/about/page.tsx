@@ -62,7 +62,7 @@ export default function About() {
       }}></div>
 
       <div className="relative z-10">
-        <Navigation currentPage="/about" />
+        <Navigation />
 
         {/* Hero Section */}
         <div className="container mx-auto px-4 py-16">
