@@ -8,7 +8,7 @@ import {
 } from "@/features/practice/components";
 import { useSpeechToText } from "@/features/speech-recognition/useSpeechToText";
 import { useGeminiGenerator } from '@/features/gemini/useGeminiGenerator';
-import { AuthLayout } from "@/components/AuthLayout";
+
 import { getSelectedExam } from "@/lib/utils";
 
 
@@ -99,7 +99,7 @@ Keep your response encouraging and constructive. Focus on helping them understan
   };
 
   return (
-    <AuthLayout requireAuth={true} requireExamSelection={true}>
+    
       <div className="relative z-10 container mx-auto px-4 py-8 max-w-4xl">
         {currentStep === 'topic' && (
           <TopicSelection
@@ -130,7 +130,7 @@ Keep your response encouraging and constructive. Focus on helping them understan
           />
         )}
       </div>
-    </AuthLayout>
+    
   );
 };
 

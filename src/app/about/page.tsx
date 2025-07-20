@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Brain, Sparkles, BookOpen, Lightbulb, Target, ArrowLeft, Quote, Users, Award } from "lucide-react";
 import Link from 'next/link';
 import { Navigation } from "@/components/Navigation";
-import { AuthLayout } from "@/components/AuthLayout";
+
 
 export default function About() {
   const steps = [
@@ -55,7 +55,6 @@ export default function About() {
   ];
 
   return (
-    <AuthLayout requireAuth={false}>
       <div className="min-h-screen bg-gray-950 relative">
         {/* Background */}
         <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-gray-950 to-black opacity-90"></div>
@@ -189,6 +188,5 @@ export default function About() {
           </div>
         </div>
       </div>
-    </AuthLayout>
   );
 } 

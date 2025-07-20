@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { LogOut } from "lucide-react";
-import { AuthLayout } from "@/components/AuthLayout";
+
 import { TOPIC_CONTENT } from "@/features/practice/constants";
 
 const ProfilePage = () => {
@@ -27,7 +27,7 @@ const ProfilePage = () => {
   };
 
   return (
-    <AuthLayout requireAuth={true} requireExamSelection={false}>
+    <>
       <div className="text-center mb-12">
         <h1 className="text-5xl font-bold text-white">Profile</h1>
       </div>
@@ -77,7 +77,7 @@ const ProfilePage = () => {
           ))}
         </div>
       </div>
-    </AuthLayout>
+    </>
   );
 };
 

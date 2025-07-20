@@ -2,7 +2,17 @@ export interface RouteConfig {
   path: string;
   requiresAuth: boolean;
   requiresExamSelection: boolean;
+  /**
+   * The path to redirect to if authentication is required but the user is not logged in.
+   * This can be different for various routes to support multiple login flows.
+   * Default value is '/auth/signin' as set in RouteProtection.tsx.
+   */
   redirectTo?: string;
+  /**
+   * The path to redirect to if exam selection is required but no exam is selected.
+   * This can be different for various routes to support specialized exam selection flows.
+   * Default value is '/exam-selection' as set in RouteProtection.tsx.
+   */
   examSelectionRedirect?: string;
 }
 
@@ -14,7 +24,7 @@ export const ROUTE_CONFIG: RouteConfig[] = [
   { path: '/profile', requiresAuth: true, requiresExamSelection: false, redirectTo: '/auth/signin' },
   { path: '/practice', requiresAuth: true, requiresExamSelection: true, redirectTo: '/auth/signin', examSelectionRedirect: '/exam-selection' },
   { path: '/custom-topic', requiresAuth: false, requiresExamSelection: false },
-  { path: '/exam-selection', requiresAuth: false, requiresExamSelection: false },
+  { path: '/exam-selection', requiresAuth: true, requiresExamSelection: false, redirectTo: '/auth/signin' },
 ];
 
 export function getRouteConfig(pathname: string): RouteConfig | undefined {

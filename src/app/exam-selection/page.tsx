@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import Image from 'next/image';
-import { AuthLayout } from "@/components/AuthLayout";
+
 import { TOPIC_CONTENT } from '@/features/practice/constants';
 
 const ExamSelectionPage = () => {
@@ -50,7 +50,7 @@ const ExamSelectionPage = () => {
   };
 
   return (
-    <AuthLayout requireAuth={false}>
+    
       <div className="flex flex-col h-screen w-full">
         {examCategories.map((exam) => {
           const config = getExamConfig(exam);
@@ -67,7 +67,7 @@ const ExamSelectionPage = () => {
           );
         })}
       </div>
-    </AuthLayout>
+    
   );
 };
 
