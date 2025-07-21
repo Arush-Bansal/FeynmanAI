@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from "react";
+import { backendApi } from '@/lib/axios';
 
 export interface GenerateResponse {
   response: string | null;
@@ -18,19 +19,12 @@ export const useGeminiGenerator = () => {
     setError(null);
     
     try {
-      const res = await fetch('/api/generate', {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt })
-      });
+      const res = await backendApi.post('/generate', { prompt });
 
-      if (!res.ok) throw new Error("Bad response from server");
-      
-      const data = await res.json();
-      setResponse(data.response || "");
-      return data.response; // Return the response directly
-    } catch (e) {
-      setError(`Failed to generate content. Please try again later. ${e}`);
+      setResponse(res.data.response || "");
+      return res.data.response; // Return the response directly
+    } catch (e: unknown) {
+      setError(`Failed to generate content. Please try again later. ${(e as Error).message}`);
       setResponse(null);
       return null; // Return null on error
     } finally {

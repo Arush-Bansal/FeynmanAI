@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import Image from 'next/image';
 
-import { TOPIC_CONTENT } from '@/features/content-library';
+import { EXAM_CATEGORIES } from '@/features/content-library';
 
 const ExamSelectionPage = () => {
   const router = useRouter();
@@ -23,8 +23,6 @@ const ExamSelectionPage = () => {
       }
     }
   }, []);
-
-  const examCategories = Object.keys(TOPIC_CONTENT);
 
   const getExamConfig = (exam: string) => {
     switch (exam) {
@@ -52,7 +50,7 @@ const ExamSelectionPage = () => {
   return (
     
       <div className="flex flex-col h-screen w-full">
-        {examCategories.map((exam) => {
+        {EXAM_CATEGORIES.map((exam) => {
           const config = getExamConfig(exam);
           return (
             <div

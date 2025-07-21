@@ -11,6 +11,9 @@ interface SubjectContent {
   [key: string]: ExamContent;
 }
 
+// Export just the exam categories for use in client components
+export const EXAM_CATEGORIES = ['JEE', 'NEET', 'UPSC'] as const;
+
 export const TOPIC_CONTENT : Record<string, SubjectContent> = {
   'JEE': {
     'Physics': {

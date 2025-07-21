@@ -6,6 +6,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Brain, Sparkles, Repeat } from "lucide-react";
 import ReactMarkdown from 'react-markdown';
 import { toast } from "sonner";
+import { AnalysisSkeleton } from '@/components/skeletons/AnalysisSkeleton';
+import { useFetchFeynmanAnalysis } from '@/features/gemini';
 
 const AnalysisResultPage = () => {
   const router = useRouter();
@@ -13,20 +15,22 @@ const AnalysisResultPage = () => {
   const topic = searchParams.get('topic');
   const exam = searchParams.get('exam');
   const subject = searchParams.get('subject');
-  const analysis = searchParams.get('analysis');
+  const transcript = searchParams.get('transcript');
+
+  const { analysisContent, isGeminiLoading } = useFetchFeynmanAnalysis({ topic: topic || '', exam: exam || '', subject: subject || '', transcript: transcript || '' });
 
   useEffect(() => {
-    if (!topic || !analysis || !exam || !subject) {
-      toast.error("Missing topic, analysis, exam, or subject data. Redirecting to select-topic page.");
+    if (!topic || !exam || !subject || !transcript) {
+      toast.error("Missing topic, exam, subject, or transcript data. Redirecting to select-topic page.");
       router.replace('/select-topic');
     }
-  }, [topic, analysis, exam, subject, router]);
+  }, [topic, exam, subject, transcript, router]);
 
   const handleTryAgain = () => {
     router.push(`/practice?exam=${exam}&subject=${subject}&topic=${topic}`);
   };
 
-  if (!topic || !analysis || !exam || !subject) {
+  if (!topic || !exam || !subject || !transcript) {
     return null; // Or a loading spinner
   }
 
@@ -44,13 +48,19 @@ const AnalysisResultPage = () => {
               <p className="text-gray-300">Here&apos;s how you did explaining <strong>{topic}</strong></p>
             </div>
 
-            <div className="bg-gray-800/50 rounded-xl p-6 mb-8 border border-gray-700">
-              <div className="prose prose-invert max-w-none text-green-400">
-                <ReactMarkdown>
-                  {decodeURIComponent(analysis)}
-                </ReactMarkdown>
+            {isGeminiLoading ? (
+              <AnalysisSkeleton />
+            ) : analysisContent ? (
+              <div className="bg-gray-800/50 rounded-xl p-6 mb-8 border border-gray-700">
+                <div className="prose prose-invert max-w-none text-green-400">
+                  <ReactMarkdown>
+                    {analysisContent}
+                  </ReactMarkdown>
+                </div>
               </div>
-            </div>
+            ) : (
+              <div className="text-red-400 text-center">Error loading analysis. Please try again.</div>
+            )}
 
             <Button
               onClick={handleTryAgain}

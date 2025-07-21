@@ -1,9 +1,9 @@
 "use client";
 
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useSpeechToText } from "@/features/speech-recognition/useSpeechToText";
-import { useGeminiGenerator } from '@/features/gemini';
+
 import { toast } from 'sonner';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -17,8 +17,6 @@ const PracticePage = () => {
   const subject = searchParams.get('subject');
 
   const { transcript, listening, startListening, stopListening } = useSpeechToText();
-  const { generateContent, isLoading: isGeminiLoading, error: geminiError } = useGeminiGenerator();
-  const [isProcessing, setIsProcessing] = useState(false);
 
   useEffect(() => {
     if (!topic || !exam || !subject) {
@@ -32,38 +30,7 @@ const PracticePage = () => {
       toast.error("Please record your explanation before submitting.");
       return;
     }
-
-    setIsProcessing(true);
-    try {
-      const examContext = exam ? `for ${exam} preparation` : '';
-      const prompt = `You are an expert teacher using the Feynman Technique. Analyze this student's explanation of "${topic}" ${examContext}:
-
-Student's explanation: "${transcript}"
-
-Please provide:
-1. **Strengths** (what they explained well)
-2. **Areas for Improvement** (what was unclear or missing)
-3. **Specific Feedback** (concrete suggestions to improve their understanding)
-4. **Key Concepts** they should focus on
-5. **A simple explanation** of the topic to help them understand better
-
-Keep your response encouraging and constructive. Focus on helping them understand the concept better.`;
-
-      const generatedAnalysis = await generateContent(prompt);
-      
-      if (generatedAnalysis) {
-        router.push(`/analysis?exam=${exam}&subject=${subject}&topic=${topic}&transcript=${encodeURIComponent(transcript)}&analysis=${encodeURIComponent(generatedAnalysis)}`);
-      } else if (geminiError) {
-        throw new Error(geminiError);
-      } else {
-        throw new Error('Failed to generate analysis');
-      }
-    } catch (error) {
-      console.error("Error during analysis:", error);
-      toast.error("Failed to get analysis. Please try again.");
-    } finally {
-      setIsProcessing(false);
-    }
+    router.push(`/analysis?exam=${exam}&subject=${subject}&topic=${topic}&transcript=${encodeURIComponent(transcript)}`);
   };
 
   if (!topic || !exam || !subject) {
@@ -122,10 +89,10 @@ Keep your response encouraging and constructive. Focus on helping them understan
               <div className="flex gap-4">
                 <Button
                   onClick={handleSubmitExplanation}
-                  disabled={!transcript.trim() || isProcessing || isGeminiLoading}
+                  disabled={!transcript.trim()}
                   className={`w-full h-12 bg-green-600 hover:bg-green-700 disabled:opacity-50`}
                 >
-                  {isProcessing || isGeminiLoading ? (
+                  {listening ? (
                     <>
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
                       Analyzing...

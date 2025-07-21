@@ -3,14 +3,31 @@
 import { useState, useEffect } from 'react';
 import { toast } from "sonner";
 import { useRouter } from 'next/navigation';
-import { TOPIC_CONTENT } from '@/features/content-library/constants';
 import { Button } from "@/components/ui/button";
 import { Zap, BookOpen, GraduationCap } from "lucide-react";
+
+interface TopicContent {
+  keyPoints: string[];
+  concepts: string;
+}
+
+interface ExamContent { 
+  [key: string]: TopicContent;
+}
+
+interface SubjectContent {
+  [key: string]: ExamContent;
+}
+
+interface TopicContentType {
+  [key: string]: SubjectContent;
+}
 
 const SelectTopicPage = () => {
   const [topic, setTopic] = useState('');
   const [selectedExamCategory, setSelectedExamCategory] = useState<string | null>(null);
   const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
+  const [topicContent, setTopicContent] = useState<TopicContentType | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -20,6 +37,13 @@ const SelectTopicPage = () => {
         setSelectedExamCategory(storedCategory);
       }
     }
+  }, []);
+
+  useEffect(() => {
+    // Dynamically import TOPIC_CONTENT to avoid serialization issues
+    import('@/features/content-library/constants').then((module) => {
+      setTopicContent(module.TOPIC_CONTENT);
+    });
   }, []);
 
   const handleTopicSubmit = () => {
@@ -45,9 +69,20 @@ const SelectTopicPage = () => {
     setTopic(''); // Clear selected topic when exam changes
   };
 
-  const exams = Object.keys(TOPIC_CONTENT);
-  const subjects = selectedExamCategory ? Object.keys(TOPIC_CONTENT[selectedExamCategory as keyof typeof TOPIC_CONTENT]) : [];
-  const topics = (selectedExamCategory && selectedSubject) ? Object.keys(TOPIC_CONTENT[selectedExamCategory as keyof typeof TOPIC_CONTENT][selectedSubject as keyof (typeof TOPIC_CONTENT)[keyof typeof TOPIC_CONTENT]]) : [];
+  if (!topicContent) {
+    return (
+      <div className="w-full px-4 md:px-8 py-8">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto"></div>
+          <p className="text-gray-300 mt-4">Loading topics...</p>
+        </div>
+      </div>
+    );
+  }
+
+  const exams = Object.keys(topicContent);
+  const subjects = selectedExamCategory ? Object.keys(topicContent[selectedExamCategory]) : [];
+  const topics = (selectedExamCategory && selectedSubject) ? Object.keys(topicContent[selectedExamCategory][selectedSubject]) : [];
 
   return (
     <div className="w-full px-4 md:px-8 py-8">
