@@ -57,7 +57,7 @@ const PracticePage = () => {
                   className={`w-24 h-24 rounded-full flex items-center justify-center transition-all duration-200 ${
                     listening 
                       ? 'bg-red-600 shadow-lg shadow-red-600/50 scale-110 animate-pulse' 
-                      : 'bg-violet-600 hover:bg-violet-700 hover:scale-105'
+                      : 'bg-green-600 hover:bg-green-700 hover:scale-105'
                   } shadow-2xl`}
                 >
                   {listening ? (

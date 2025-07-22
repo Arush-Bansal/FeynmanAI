@@ -66,7 +66,7 @@ const ProfilePage = () => {
               variant={selectedExam === exam ? "default" : "secondary"}
               className={`cursor-pointer text-lg px-4 py-2 ${
                 selectedExam === exam 
-                  ? 'bg-violet-600 text-white' 
+                  ? 'bg-green-600 text-white' 
                   : 'bg-gray-800 text-gray-300 hover:bg-gray-700 border-gray-600'
               }`}
               onClick={() => handleExamSelect(exam)}

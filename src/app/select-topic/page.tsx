@@ -184,10 +184,10 @@ const SelectTopicPage = () => {
 
       {/* Selected Topic Display */}
       {topic && (
-        <div className="mb-6 p-4 bg-violet-600/20 border border-violet-600/30 rounded-lg">
+        <div className="mb-6 p-4 bg-green-600/20 border border-green-600/30 rounded-lg">
           <div className="flex items-center gap-2 mb-2">
-            <GraduationCap className="h-5 w-5 text-violet-400" />
-            <span className="text-sm font-medium text-violet-300">Selected Topic:</span>
+            <GraduationCap className="h-5 w-5 text-green-400" />
+            <span className="text-sm font-medium text-green-300">Selected Topic:</span>
           </div>
           <p className="text-white font-semibold text-lg">{topic}</p>
         </div>
@@ -197,7 +197,7 @@ const SelectTopicPage = () => {
         <Button 
           onClick={handleTopicSubmit}
           disabled={!topic.trim() || !selectedExamCategory || !selectedSubject}
-          className="w-full sm:w-auto h-14 text-lg font-semibold bg-violet-600 hover:bg-violet-700 transform hover:scale-105 transition-all duration-200 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full sm:w-auto h-14 text-lg font-semibold bg-green-600 hover:bg-green-700 transform hover:scale-105 transition-all duration-200 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Let&apos;s Practice! 🚀
         </Button>

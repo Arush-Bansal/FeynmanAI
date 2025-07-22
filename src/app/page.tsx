@@ -44,7 +44,7 @@ export default function Home() {
               <div className="flex gap-4 justify-center mb-16">
                 {session ? (
                   <Link href="/practice">
-                    <Button size="lg" className="bg-violet-600 hover:bg-violet-700 text-lg px-8 py-4">
+                    <Button size="lg" className="bg-gradient-to-r from-green-500 to-green-400 text-white text-lg px-8 py-4 rounded-md shadow-md hover:brightness-105 transition-all duration-200">
                       Start Practicing Now
                       <ArrowRight className="ml-2 h-5 w-5" />
                     </Button>
@@ -120,7 +120,7 @@ export default function Home() {
                   Choose any topic and start explaining. Our AI will help you identify areas for improvement.
                 </p>
                 <Link href="/practice">
-                  <Button size="lg" className="bg-violet-600 hover:bg-violet-700 text-lg px-8 py-4">
+                  <Button size="lg" className="bg-gradient-to-r from-green-500 to-green-400 text-white text-lg px-8 py-4 rounded-md shadow-md hover:brightness-105 transition-all duration-200">
                     Start Your First Practice Session
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </Button>

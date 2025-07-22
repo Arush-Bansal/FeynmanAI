@@ -32,16 +32,9 @@ export default function RootLayout({
         <ReactQueryProvider>
           {/* Provides React Query context to all components within the application */}
           <div
-            className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen bg-gray-950 relative`}
+            className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen bg-black relative`}
           >
-            <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-gray-950 to-black opacity-90"></div>
-            <div
-              className="absolute inset-0"
-              style={{
-                backgroundImage:
-                  'radial-gradient(circle at 25% 25%, rgba(139, 92, 246, 0.1) 0%, transparent 50%), radial-gradient(circle at 75% 75%, rgba(59, 130, 246, 0.1) 0%, transparent 50%)',
-              }}
-            ></div>
+            <div className="absolute inset-0 bg-gradient-to-br from-black via-black to-black opacity-90"></div>
             <SessionWrapper>
               <div className="relative z-10">
                 <Navigation />
