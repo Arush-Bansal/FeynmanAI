@@ -2,8 +2,7 @@
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Brain, Sparkles, Repeat } from "lucide-react";
+import { Repeat } from "lucide-react";
 import ReactMarkdown from 'react-markdown';
 import { toast } from "sonner";
 import { AnalysisSkeleton } from '@/components/skeletons/AnalysisSkeleton';
@@ -35,45 +34,65 @@ const AnalysisResultPage = () => {
   }
 
   return (
-    <div className="relative z-10">
-      <div className="container mx-auto px-4 py-8 max-w-4xl pt-8">
-        <Card className="bg-gray-900/50 border-gray-700 backdrop-blur-sm shadow-2xl">
-          <CardContent className="p-8">
-            <div className="text-center mb-8">
-              <div className="flex items-center justify-center gap-2 mb-4">
-                <Brain className="h-8 w-8 text-green-400" />
-                <h2 className="text-3xl font-bold text-white">Analysis Complete!</h2>
-                <Sparkles className="h-6 w-6 text-yellow-400" />
-              </div>
-              <p className="text-gray-300">Here&apos;s how you did explaining <strong>{topic}</strong></p>
+    <div className="min-h-screen bg-gray-900 text-white p-8">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-4 gap-8">
+
+        {/* Main Content */}
+        <main className="lg:col-span-3 bg-gray-800/50 rounded-lg p-8 shadow-lg border border-gray-700">
+          <header className="border-b border-gray-600 pb-4 mb-6">
+            <p className="text-sm text-gray-400">{exam} &gt; {subject}</p>
+            <h1 className="text-4xl font-bold text-white mt-2">Analysis Report: {topic}</h1>
+          </header>
+
+          <section id="your-explanation" className="mb-8 scroll-mt-20">
+            <h2 className="text-2xl font-semibold text-green-400 mb-4">Your Explanation</h2>
+            <div className="bg-gray-900/70 rounded-md p-6 border border-gray-700">
+              <p className="text-gray-300 italic leading-relaxed">
+                {decodeURIComponent(transcript)}
+              </p>
             </div>
+          </section>
 
-            {isGeminiLoading ? (
-              <AnalysisSkeleton />
-            ) : analysisContent ? (
-              <div className="bg-gray-800/50 rounded-xl p-6 mb-8 border border-gray-700">
-                <div className="prose prose-invert max-w-none text-green-400">
-                  <ReactMarkdown>
-                    {analysisContent}
-                  </ReactMarkdown>
-                </div>
-              </div>
-            ) : (
-              <div className="text-red-400 text-center">Error loading analysis. Please try again.</div>
-            )}
+          <section id="gemini-feedback" className="mb-8 scroll-mt-20">
+            <h2 className="text-2xl font-semibold text-green-400 mb-4">Gemini's Feedback</h2>
+            <div className="prose prose-invert max-w-none text-gray-300">
+              {isGeminiLoading ? (
+                <AnalysisSkeleton />
+              ) : analysisContent ? (
+                <ReactMarkdown>{analysisContent}</ReactMarkdown>
+              ) : (
+                <div className="text-red-400">Error loading analysis.</div>
+              )}
+            </div>
+          </section>
 
-            <Button
-              onClick={handleTryAgain}
-              className="w-full h-14 text-lg font-semibold bg-blue-600 hover:bg-blue-700 transform hover:scale-105 transition-all duration-200 shadow-lg"
-            >
-              <Repeat className="h-5 w-5 mr-2" />
-              Try Again
-            </Button>
-          </CardContent>
-        </Card>
+          <section id="next-steps" className="scroll-mt-20">
+             <h2 className="text-2xl font-semibold text-green-400 mb-4">Next Steps</h2>
+             <Button
+                onClick={handleTryAgain}
+                className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition-transform transform hover:scale-105"
+              >
+                <Repeat className="h-5 w-5 mr-2 inline-block" />
+                Try Explaining Again
+              </Button>
+          </section>
+        </main>
+
+        {/* Sidebar */}
+        <aside className="lg:col-span-1 h-fit sticky top-24">
+          <div className="bg-gray-800/50 rounded-lg p-6 shadow-lg border border-gray-700">
+            <h3 className="text-xl font-bold text-white mb-4 border-b border-gray-600 pb-2">Contents</h3>
+            <ul className="space-y-3 text-gray-300">
+              <li><a href="#your-explanation" className="hover:text-green-400 transition-colors">1. Your Explanation</a></li>
+              <li><a href="#gemini-feedback" className="hover:text-green-400 transition-colors">2. Gemini's Feedback</a></li>
+              <li><a href="#next-steps" className="hover:text-green-400 transition-colors">3. Next Steps</a></li>
+            </ul>
+          </div>
+        </aside>
+
       </div>
     </div>
   );
-};
+}
 
 export default AnalysisResultPage;

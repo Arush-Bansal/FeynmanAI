@@ -30,6 +30,7 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <ReactQueryProvider>
+          {/* Provides React Query context to all components within the application */}
           <div
             className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen bg-gray-950 relative`}
           >
