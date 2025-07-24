@@ -21,9 +21,10 @@ export function GoogleLoginButton() {
       <Link href="/profile">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src={session.user?.image || ''}
+          src={session.user?.image || "/default-avatar.svg"}
           alt="Profile"
           className="w-8 h-8 rounded-full cursor-pointer"
+          onError={(e) => { e.currentTarget.src = "/default-avatar.svg"; }}
         />
       </Link>
     )

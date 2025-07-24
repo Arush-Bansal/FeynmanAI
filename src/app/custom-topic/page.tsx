@@ -1,12 +1,15 @@
 "use client"
 import { useState } from 'react';
+import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Lightbulb, Mail, CheckCircle, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 
+
 const CustomTopicPage = () => {
-  const [email, setEmail] = useState('');
+  const { data: session } = useSession();
+  const [email, setEmail] = useState(session?.user?.email || '');
   const [customTopic, setCustomTopic] = useState('');
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -67,41 +70,43 @@ const CustomTopicPage = () => {
 
   if (isSubmitted) {
     return (
-      <div className="relative z-10">
-        <div className="container mx-auto px-4 py-8 max-w-2xl pt-8">
 
-          <Card className="bg-gray-900/50 border-gray-700 backdrop-blur-sm shadow-2xl">
-            <CardContent className="p-8 text-center">
-              <CheckCircle className="h-16 w-16 text-green-400 mx-auto mb-6" />
-              <h2 className="text-3xl font-bold text-white mb-4">Thank You!</h2>
-              <p className="text-gray-300 text-lg mb-6">
-                We&apos;ve received your custom topic request. We&apos;ll review it and get back to you soon!
-              </p>
-              <p className="text-gray-400 mb-8">
-                We&apos;ll send you an email at <strong className="text-white">{email}</strong> once your topic is added to our collection.
-              </p>
-              
-              <div className="space-y-4">
-                <Button
-                  onClick={handleBack}
-                  className="w-full bg-violet-600 hover:bg-violet-700"
-                >
-                  <ArrowLeft className="h-4 w-4 mr-2" />
-                  Request Another Topic
-                </Button>
+        <div className="relative z-10">
+          <div className="container mx-auto px-4 py-8 max_w-2xl pt-8">
+
+            <Card className="bg-gray-900/50 border-gray-700 backdrop-blur-sm shadow-2xl">
+              <CardContent className="p-8 text-center">
+                <CheckCircle className="h-16 w-16 text-green-400 mx-auto mb-6" />
+                <h2 className="text-3xl font-bold text-white mb-4">Thank You!</h2>
+                <p className="text-gray-300 text-lg mb-6">
+                  We&apos;ve received your custom topic request. We&apos;ll review it and get back to you soon!
+                </p>
+                <p className="text-gray-400 mb-8">
+                  We&apos;ll send you an email at <strong className="text-white">{email}</strong> once your topic is added to our collection.
+                </p>
                 
-                <Button
-                  variant="outline"
-                  onClick={() => window.location.href = '/practice'}
-                  className="w-full border-gray-600 text-gray-300 hover:bg-gray-800 hover:text-white"
-                >
-                  Back to Practice
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+                <div className="space-y-4">
+                  <Button
+                    onClick={handleBack}
+                    className="w-full bg-violet-600 hover:bg-violet-700"
+                  >
+                    <ArrowLeft className="h-4 w-4 mr-2" />
+                    Request Another Topic
+                  </Button>
+                  
+                  <Button
+                    variant="outline"
+                    onClick={() => window.location.href = '/practice'}
+                    className="w-full border-gray-600 text-gray-300 hover:bg-gray-800 hover:text-white"
+                  >
+                    Back to Practice
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </div>
-      </div>
+
     );
   }
 
@@ -178,4 +183,4 @@ const CustomTopicPage = () => {
   );
 };
 
-export default CustomTopicPage; 
+export default CustomTopicPage;

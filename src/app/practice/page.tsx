@@ -1,177 +1,115 @@
-"use client"
-import { useState, useEffect } from 'react';
-import { useSession } from "next-auth/react";
-import { useRouter } from 'next/navigation';
-import { toast } from "sonner";
-import {
-  TopicSelection,
-  RecordingInterface,
-  AnalysisResult
-} from "@/features/practice/components";
-import { useSpeechToText } from "@/features/speech-recognition/useSpeechToText";
-import { useGeminiGenerator } from '@/features/gemini/useGeminiGenerator';
-import { TOPIC_CONTENT } from '@/features/practice/constants';
+"use client";
 
-export type PracticeStep = 'topic' | 'recording' | 'result';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useEffect } from 'react';
+import { useSpeechToText } from "@/features/speech-recognition/useSpeechToText";
+
+import { toast } from 'sonner';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Mic, Square, Send } from 'lucide-react';
 
 const PracticePage = () => {
-  const { data: session, status } = useSession();
   const router = useRouter();
-  const [currentStep, setCurrentStep] = useState<PracticeStep>('topic');
-  const [topic, setTopic] = useState('');
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [analysis, setAnalysis] = useState('');
-  const [selectedExamCategory, setSelectedExamCategory] = useState<string | null>(null);
-  
-  const { generateContent, isLoading: isGeminiLoading, error: geminiError, response: geminiResponse } = useGeminiGenerator();
+  const searchParams = useSearchParams();
+  const topic = searchParams.get('topic');
+  const exam = searchParams.get('exam');
+  const subject = searchParams.get('subject');
 
-  const {
-    listening: isRecording,
-    transcript,
-    startListening: startRecording,
-    stopListening: stopRecording,
-    resetTranscript
-  } = useSpeechToText();
+  const { transcript, listening, startListening, stopListening } = useSpeechToText();
 
   useEffect(() => {
-    if (status === 'unauthenticated') {
-      router.push('/auth/signin');
+    if (!topic || !exam || !subject) {
+      toast.error("Missing topic, exam, or subject. Redirecting to select-topic page.");
+      router.replace('/select-topic');
     }
-  }, [status, router]);
+  }, [topic, exam, subject, router]);
 
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const storedCategory = localStorage.getItem('selectedExamCategory');
-      if (storedCategory) {
-        setSelectedExamCategory(storedCategory);
-      }
-    }
-  }, []);
-
-  const handleTopicSubmit = () => {
-    if (!topic.trim()) {
-      toast.error('Please select a topic to practice!');
+  const handleSubmitExplanation = async () => {
+    if (!transcript.trim()) {
+      toast.error("Please record your explanation before submitting.");
       return;
     }
-    setCurrentStep('recording');
+    router.push(`/analysis?exam=${exam}&subject=${subject}&topic=${topic}&transcript=${encodeURIComponent(transcript)}`);
   };
 
-  const handleSubmitExplanation = async (explanation: string) => {
-    setIsProcessing(true);
-    
-    try {
-      const topicContent = TOPIC_CONTENT[topic as keyof typeof TOPIC_CONTENT];
-      
-      let topicContext = '';
-      if (topicContent) {
-        topicContext = `
-
-**Expected Topic Content for "${topic}":**
-
-**Key Concepts to Cover:**
-${Object.keys(topicContent).map(key => `- ${key}`).join('\n')}
-
-**Key Points that should be mentioned:**
-${Object.values(topicContent).map(value => `- ${value}`).join('\n')}
-
-**Analysis Guidelines:**
-Please evaluate whether the user's explanation covers these key points and concepts.`;
-      }
-
-      const prompt = `Analyze this explanation of "${topic}" using the Feynman Technique principles. The user's explanation is:
-
-"${explanation}"${topicContext}
-
-Please provide a comprehensive analysis in markdown format with the following sections:
-
-1. **Strengths** - What they did well overall
-
-2. **Key Points Analysis** - Go through each key point and provide specific feedback:
-   - For each key point, state whether they covered it or not
-   - If covered: Rate their explanation (Excellent/Good/Needs Improvement) and provide brief feedback
-   - If missed: Explain what this concept is and how they could include it simply
-
-3. **Areas to improve** - Specific suggestions for better explanation
-
-4. **Tips** - How to apply the Feynman Technique better
-
-5. **Overall feedback** - Encouraging summary with a score (e.g., "You covered 6 out of 8 key points")
-
-Focus on clarity, simplicity, and whether they could explain this to someone with no background in the topic. For each key point they missed, provide a simple explanation of what that concept is so they can include it next time.`;
-
-      await generateContent(prompt);
-      
-      if (geminiError) {
-        throw new Error(geminiError);
-      }
-      
-      if (geminiResponse) {
-        setAnalysis(geminiResponse);
-        setCurrentStep('result');
-      }
-      
-    } catch (error) {
-      console.error('Analysis error:', error);
-      toast.error('Failed to analyze your explanation. Please try again.');
-    } finally {
-      setIsProcessing(false);
-    }
-  };
-
-  const resetPractice = () => {
-    setCurrentStep('topic');
-    setTopic('');
-    setAnalysis('');
-    resetTranscript();
-  };
-
-  // const goBackToTopic = () => {
-  //   setCurrentStep('topic');
-  //   resetTranscript();
-  // };
-
-  if (status === 'loading' || !session) {
-    return (
-      <div className="min-h-screen bg-gray-950 flex items-center justify-center">
-        <div className="text-white">Loading...</div>
-      </div>
-    );
+  if (!topic || !exam || !subject) {
+    return null; // Or a loading spinner
   }
 
   return (
-    <>
-    <div className="relative z-10 container mx-auto px-4 py-8 max-w-4xl">
-        {currentStep === 'topic' && (
-          <TopicSelection
-            topic={topic}
-            onTopicChange={setTopic}
-            onTopicSubmit={handleTopicSubmit}
-            selectedExamCategory={selectedExamCategory}
-          />
-        )}
+    <div className="relative z-10">
+      <div className="container mx-auto px-4 py-8 max-w-4xl pt-8">
+        <Card className="bg-gray-900/50 border-gray-700 backdrop-blur-sm shadow-2xl">
+          <CardContent className="p-8">
+            <div className="text-center mb-8">
+              <h2 className="text-3xl font-bold text-white mb-2">Explain: {topic}</h2>
+              <p className="text-gray-300 text-lg">Hold the mic button or spacebar to record your explanation</p>
+            </div>
 
-        {currentStep === 'recording' && (
-          <RecordingInterface
-            topic={topic}
-            transcript={transcript}
-            isRecording={isRecording}
-            isProcessing={isProcessing || isGeminiLoading}
-            onStartRecording={startRecording}
-            onStopRecording={stopRecording}
-            onSubmitExplanation={handleSubmitExplanation}
-            // onChangeTopic={goBackToTopic}
-          />
-        )}
+            <div className="space-y-8">
+              <div className="flex flex-col items-center justify-center">
+                <button
+                  onMouseDown={startListening}
+                  onMouseUp={stopListening}
+                  onTouchStart={startListening}
+                  onTouchEnd={stopListening}
+                  className={`w-24 h-24 rounded-full flex items-center justify-center transition-all duration-200 ${
+                    listening 
+                      ? 'bg-red-600 shadow-lg shadow-red-600/50 scale-110 animate-pulse' 
+                      : 'bg-green-600 hover:bg-green-700 hover:scale-105'
+                  } shadow-2xl`}
+                >
+                  {listening ? (
+                    <Square className="h-8 w-8 text-white" />
+                  ) : (
+                    <Mic className="h-8 w-8 text-white" />
+                  )}
+                </button>
+                <p className="text-gray-300 mt-4">
+                  {listening ? 'Recording... Release to stop' : 'Hold to record'}
+                </p>
+              </div>
 
-        {currentStep === 'result' && (
-          <AnalysisResult
-            topic={topic}
-            analysis={analysis}
-            onReset={resetPractice}
-          />
-        )}
+              <div className="bg-gray-800/50 rounded-xl p-6 min-h-48 border border-gray-700">
+                <h3 className="text-white font-semibold mb-4 flex items-center gap-2">
+                  <Mic className="h-4 w-4" />
+                  Your Explanation:
+                </h3>
+                <div className="text-gray-200 text-lg leading-relaxed">
+                  {transcript || (
+                    <span className="text-gray-500 italic">
+                      Your words will appear here as you speak...
+                    </span>
+                  )}
+                  {listening && <span className="animate-pulse">|</span>}
+                </div>
+              </div>
+
+              <div className="flex gap-4">
+                <Button
+                  onClick={handleSubmitExplanation}
+                  disabled={!transcript.trim()}
+                  className={`w-full h-12 bg-green-600 hover:bg-green-700 disabled:opacity-50`}
+                >
+                  {listening ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                      Analyzing...
+                    </>
+                  ) : (
+                    <>
+                      <Send className="h-4 w-4 mr-2" />
+                      Get My Analysis
+                    </>
+                  )}
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
-    </>
+    </div>
   );
 };
 
