@@ -5,6 +5,7 @@ import { Brain, Zap, ArrowRight, Target, Award } from "lucide-react";
 import Link from 'next/link';
 import { useSession } from "next-auth/react";
 import { signIn } from "next-auth/react";
+import { KnowledgeGraphDemo } from "@/components/KnowledgeGraphDemo";
 
 export default function Home() {
   const { data: session } = useSession();
@@ -127,6 +128,10 @@ export default function Home() {
                 </Link>
               </CardContent>
             </Card>
+          </div>
+
+          <div className="container mx-auto px-4 py-16">
+            <KnowledgeGraphDemo />
           </div>
         </>
   );
