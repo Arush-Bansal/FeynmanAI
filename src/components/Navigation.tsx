@@ -1,7 +1,6 @@
 "use client"
 import { Brain } from "lucide-react";
 import Link from 'next/link';
-import { GoogleLoginButton } from "./GoogleLoginButton";
 // import feynmanLogo from "@/assets/feynman-logo.png"; // Uncomment if you have a logo image
 
 export function Navigation() {
@@ -21,7 +20,7 @@ export function Navigation() {
             </Link>
           </div>
           <div className="flex items-center gap-4">
-            <GoogleLoginButton />
+            {/* <GoogleLoginButton /> Removed as per request */}
           </div>
         </div>
       </div>
