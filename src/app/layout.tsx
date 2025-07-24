@@ -28,6 +28,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <link rel="icon" type="image/svg+xml" href="/brain-favicon.svg" />
+      </head>
       <body>
         <ReactQueryProvider>
           {/* Provides React Query context to all components within the application */}
