@@ -38,9 +38,7 @@ export default function RootLayout({
             <SessionWrapper>
               <div className="relative z-10">
                 <Navigation />
-                <div className="container mx-auto px-4 py-8 max-w-4xl pt-20">
-                  <RouteProtection>{children}</RouteProtection>
-                </div>
+                <RouteProtection>{children}</RouteProtection>
               </div>
             </SessionWrapper>
           </div>
