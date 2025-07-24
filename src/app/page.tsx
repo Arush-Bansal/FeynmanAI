@@ -89,7 +89,7 @@ export default function Home() {
                 </p>
               </div>
 
-              <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex flex-col sm:flex-row gap-4 items-center">
                 {session ? (
                   <>
                     <Link href="/practice">
@@ -99,7 +99,7 @@ export default function Home() {
                       </Button>
                     </Link>
                     <Link href="/custom-topic">
-                      <Button variant="outline" size="lg" className="text-lg px-8 border-green-500/20 text-green-400 hover:bg-green-500/10">
+                      <Button variant="outline" size="lg" className="text-lg px-8 border-green-500/50 text-green-400 hover:bg-green-500/10">
                         Request Topic
                       </Button>
                     </Link>
@@ -259,7 +259,7 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             {session ? (
               <>
                 <Link href="/practice">
@@ -269,7 +269,7 @@ export default function Home() {
                   </Button>
                 </Link>
                 <Link href="/custom-topic">
-                  <Button variant="outline" size="lg" className="text-lg px-8 border-green-500/20 text-green-400 hover:bg-green-500/10">
+                  <Button variant="outline" size="lg" className="text-lg px-8 border-green-500/50 text-green-400 hover:bg-green-500/10">
                     Request New Topic
                   </Button>
                 </Link>
