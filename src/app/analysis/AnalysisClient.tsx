@@ -34,11 +34,11 @@ const AnalysisClient = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white p-8">
+    <div className="min-h-screen bg-gray-900 text-white p-0 sm:p-8">
       <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-4 gap-8">
 
         {/* Main Content */}
-        <main className="lg:col-span-3 bg-gray-800/50 rounded-lg p-8 shadow-lg border border-gray-700">
+        <main className="lg:col-span-3 bg-gray-800/50 sm:rounded-lg p-4 sm:p-8 shadow-lg sm:border border-gray-700">
           <header className="border-b border-gray-600 pb-4 mb-6">
             <p className="text-sm text-gray-400">{exam} &gt; {subject}</p>
             <h1 className="text-4xl font-bold text-white mt-2">Analysis Report: {topic}</h1>
@@ -79,7 +79,7 @@ const AnalysisClient = () => {
         </main>
 
         {/* Sidebar */}
-        <aside className="lg:col-span-1 h-fit sticky top-24">
+        <aside className="hidden lg:block lg:col-span-1 h-fit sticky top-24">
           <div className="bg-gray-800/50 rounded-lg p-6 shadow-lg border border-gray-700">
             <h3 className="text-xl font-bold text-white mb-4 border-b border-gray-600 pb-2">Contents</h3>
             <ul className="space-y-3 text-gray-300">
