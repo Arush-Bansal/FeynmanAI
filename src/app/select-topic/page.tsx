@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { useRouter } from 'next/navigation';
 import { Button } from "@/components/ui/button";
 import { Zap, BookOpen, GraduationCap } from "lucide-react";
+import { TOPIC_CONTENT } from '@/features/content-library/constants';
 
 interface TopicContent {
   keyPoints: string[];
@@ -27,7 +28,6 @@ const SelectTopicPage = () => {
   const [topic, setTopic] = useState('');
   const [selectedExamCategory, setSelectedExamCategory] = useState<string | null>(null);
   const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
-  const [topicContent, setTopicContent] = useState<TopicContentType | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -39,19 +39,16 @@ const SelectTopicPage = () => {
     }
   }, []);
 
-  useEffect(() => {
-    // Dynamically import TOPIC_CONTENT to avoid serialization issues
-    import('@/features/content-library/constants').then((module) => {
-      setTopicContent(module.TOPIC_CONTENT);
-    });
-  }, []);
-
   const handleTopicSubmit = () => {
     if (!topic.trim() || !selectedExamCategory || !selectedSubject) {
       toast.error('Please select an exam, subject, and topic to practice!');
       return;
     }
-    router.push(`/practice?exam=${selectedExamCategory}&subject=${selectedSubject}&topic=${topic}`);
+
+    const selectedTopicContent = TOPIC_CONTENT[selectedExamCategory]?.[selectedSubject]?.[topic];
+    const keyPoints = selectedTopicContent ? selectedTopicContent.keyPoints.join(',') : '';
+
+    router.push(`/practice?exam=${selectedExamCategory}&subject=${selectedSubject}&topic=${topic}${keyPoints ? `&keyPoints=${keyPoints}` : ''}`);
   };
 
   const handleTopicSelect = (selectedTopic: string) => {
@@ -69,20 +66,9 @@ const SelectTopicPage = () => {
     setTopic(''); // Clear selected topic when exam changes
   };
 
-  if (!topicContent) {
-    return (
-      <div className="w-full px-4 md:px-8 py-8">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto"></div>
-          <p className="text-gray-300 mt-4">Loading topics...</p>
-        </div>
-      </div>
-    );
-  }
-
-  const exams = Object.keys(topicContent);
-  const subjects = selectedExamCategory ? Object.keys(topicContent[selectedExamCategory]) : [];
-  const topics = (selectedExamCategory && selectedSubject) ? Object.keys(topicContent[selectedExamCategory][selectedSubject]) : [];
+  const exams = Object.keys(TOPIC_CONTENT);
+  const subjects = selectedExamCategory ? Object.keys(TOPIC_CONTENT[selectedExamCategory]) : [];
+  const topics = (selectedExamCategory && selectedSubject) ? Object.keys(TOPIC_CONTENT[selectedExamCategory][selectedSubject]) : [];
 
   return (
     <div className="w-full px-4 md:px-8 py-8">

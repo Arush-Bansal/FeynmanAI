@@ -15,6 +15,7 @@ const PracticeClientPage = () => {
   const topic = searchParams.get('topic');
   const exam = searchParams.get('exam');
   const subject = searchParams.get('subject');
+  const keyPoints = searchParams.get('keyPoints'); // Get keyPoints from search params
 
   const { transcript, listening, startListening, stopListening } = useSpeechToText();
 
@@ -30,7 +31,8 @@ const PracticeClientPage = () => {
       toast.error("Please record your explanation before submitting.");
       return;
     }
-    router.push(`/analysis?exam=${exam}&subject=${subject}&topic=${topic}&transcript=${encodeURIComponent(transcript)}`);
+    // Pass keyPoints to the analysis page
+    router.push(`/analysis?exam=${exam}&subject=${subject}&topic=${topic}&transcript=${encodeURIComponent(transcript)}${keyPoints ? `&keyPoints=${keyPoints}` : ''}`);
   };
 
   if (!topic || !exam || !subject) {

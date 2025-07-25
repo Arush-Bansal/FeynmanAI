@@ -1,2 +1,2 @@
-export * from './useGeminiGenerator';
+// export * from './useGeminiGenerator';
 export * from './useFetchFeynmanAnalysis';

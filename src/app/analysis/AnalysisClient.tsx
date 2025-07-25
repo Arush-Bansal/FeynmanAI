@@ -7,6 +7,7 @@ import ReactMarkdown from 'react-markdown';
 import { toast } from "sonner";
 import { AnalysisSkeleton } from '@/components/skeletons/AnalysisSkeleton';
 import { useFetchFeynmanAnalysis } from '@/features/gemini';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 const AnalysisClient = () => {
   const router = useRouter();
@@ -15,8 +16,16 @@ const AnalysisClient = () => {
   const exam = searchParams.get('exam');
   const subject = searchParams.get('subject');
   const transcript = searchParams.get('transcript');
+  const keyPointsParam = searchParams.get('keyPoints');
+  const keyPoints = keyPointsParam ? keyPointsParam.split(',') : [];
 
-  const { analysisContent, isGeminiLoading } = useFetchFeynmanAnalysis({ topic: topic || '', exam: exam || '', subject: subject || '', transcript: transcript || '' });
+  const { analysisContent, isGeminiLoading } = useFetchFeynmanAnalysis({
+    topic: topic || '',
+    exam: exam || '',
+    subject: subject || '',
+    keyPoints: keyPoints,
+    transcript: transcript || ''
+  });
 
   useEffect(() => {
     if (!topic || !exam || !subject || !transcript) {
@@ -59,7 +68,18 @@ const AnalysisClient = () => {
               {isGeminiLoading ? (
                 <AnalysisSkeleton />
               ) : analysisContent ? (
-                <ReactMarkdown>{analysisContent}</ReactMarkdown>
+                <Card className="bg-gray-700 border-gray-600">
+                  <CardHeader>
+                    <CardTitle className="text-xl text-white">Analysis Results</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-gray-300 leading-relaxed">
+                      <ReactMarkdown>
+                        {analysisContent}
+                      </ReactMarkdown>
+                    </div>
+                  </CardContent>
+                </Card>
               ) : (
                 <div className="text-red-400">Error loading analysis.</div>
               )}
