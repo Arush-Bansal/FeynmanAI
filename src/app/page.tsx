@@ -64,10 +64,10 @@ export default function Home() {
   return (
     <div className="relative min-h-screen bg-black text-white">
       {/* Hero Section */}
-      <section className="py-20 px-4">
+      <section className="py-10 px-4">
         <div className="container mx-auto max-w-6xl">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div className="space-y-8">
+            <div className="space-y-2">
               <Badge variant="secondary" className="border-green-500/20 text-green-400">
                 <Zap className="h-3 w-3 mr-1" />
                 AI-Powered Learning Revolution
@@ -89,7 +89,7 @@ export default function Home() {
                 </p>
               </div>
 
-              <div className="flex flex-row gap-4 items-center justify-center">
+              <div className="flex flex-col sm:flex-row gap-4 items-center justify-start">
                 {session ? (
                   <>
                     <Link href="/practice">

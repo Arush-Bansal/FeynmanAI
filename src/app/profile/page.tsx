@@ -38,7 +38,7 @@ const ProfilePage = () => {
             <img
               src={session.user.image}
               alt="Profile"
-              className="w-24 h-24 rounded-full"
+              className="w-24 h-24 rounded-full hidden sm:block"
             />
           )}
           <div>
