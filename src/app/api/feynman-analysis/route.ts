@@ -1,144 +1,165 @@
-import { GoogleGenerativeAI, Tool } from '@google/generative-ai';  
+import { GoogleGenerativeAI } from '@google/generative-ai';  
 import { NextResponse } from 'next/server';  
 import { config } from 'dotenv';
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { analyzeFeynmanExplanationTool, generateFeynmanPrompt } from '@/features/feynman-utils';
 
 // Load environment variables
 config();
 
-const analyzeFeynmanExplanationTool = {
-  functionDeclarations: [{
-    name: "analyzeFeynmanExplanation",
-    description: "Analyzes a student's explanation of a topic using the Feynman Technique and provides structured feedback.",
-    parameters: {
-      type: "object",
-      properties: {
-        exam: {
-          type: "string",
-          description: "The exam context for the topic (e.g., 'JEE', 'NEET', 'UPSC')."
-        },
-        subject: {
-          type: "string",
-          description: "The subject of the topic (e.g., 'Physics', 'Chemistry', 'Biology')."
-        },
-        topic: {
-          type: "string",
-          description: "The main topic the student is explaining."
-        },
-        keyPoints: {
-          type: "array",
-          items: {
-            type: "string"
-          },
-          description: "A list of key points the user was required to cover."
-        },
-        userTranscript: {
-          type: "string",
-          description: "The full transcript of the user's explanation."
-        },
-        coveredTopics: {
-          type: "array",
-          items: {
-            type: "object",
-            properties: {
-              topicName: {
-                type: "string",
-                description: "Name of the sub-topic or key concept."
-              },
-              covered: {
-                type: "boolean",
-                description: "True if the topic was covered, false otherwise."
-              }
-            },
-            required: ["topicName", "covered"]
-          },
-          description: "A list of sub-topics or key concepts and whether they were covered by the user."
-        },
-        detailedAnalysis: {
-          type: "string",
-          description: "A detailed analysis of the user's explanation, including strengths, areas for improvement, and specific feedback."
-        },
-        sideQuestions: {
-          type: "array",
-          items: {
-            type: "object",
-            properties: {
-              question: {
-                type: "string",
-                description: "A side question asked by the user."
-              },
-              answer: {
-                type: "string",
-                description: "The answer to the side question."
-              }
-            },
-            required: ["question", "answer"]
-          },
-          description: "A list of any side questions asked by the user in the transcript and their answers."
-        },
-        similarTopics: {
-          type: "array",
-          items: {
-            type: "string"
-          },
-          description: "A list of topics similar to this one that the user can practice."
-        },
-        overallScore: {
-          type: "number",
-          description: "An overall score (0-100) for the user's performance based on their explanation."
-        }
-      },
-      required: ["exam", "subject", "topic", "keyPoints", "userTranscript", "coveredTopics", "detailedAnalysis", "sideQuestions", "similarTopics", "overallScore"]
-    }
-  }]
-} as Tool;
-
-const generateFeynmanPrompt = (topic: string, exam: string, subject: string, keyPoints: string[], transcript: string) => {
-  const examContext = exam ? `for ${exam} preparation` : '';
-  const subjectContext = subject ? `in ${subject}` : '';
-  const keyPointsList = keyPoints.length > 0 ? `The user was required to cover the following key points: ${keyPoints.join(', ')}.` : '';
-
-  return `You are an expert teacher using the Feynman Technique. Analyze this student's explanation of "${topic}" ${subjectContext} ${examContext}.
-${keyPointsList}
-
-Student's explanation: "${decodeURIComponent(transcript)}"
-
-Please call the 'analyzeFeynmanExplanation' function with a comprehensive analysis based on the student's explanation. Ensure all parameters are filled accurately.`;
-};
-
 export async function POST(request: Request) {  
-  const { topic, exam, subject, keyPoints, transcript } = await request.json();
+  const startTime = Date.now();
+  console.log('=== FEYNMAN ANALYSIS REQUEST START ===');
   
-  const API_KEY = process.env.GEMINI_API_KEY;
-  if (!API_KEY) {
-    return NextResponse.json({ error: "GEMINI_API_KEY not set" }, { status: 500 });
-  }
-
-  const genAI = new GoogleGenerativeAI(API_KEY);  
-  const modelConfig = { model: "gemini-2.5-flash", tools: [analyzeFeynmanExplanationTool] };
-  const model = genAI.getGenerativeModel(modelConfig);  
-
-  const prompt = generateFeynmanPrompt(topic, exam, subject, keyPoints, transcript);
-
-  try {  
-    const result = await model.generateContent([prompt]);  
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let session: any = null;
+  
+  try {
+    // Check authentication
+    console.log('Checking authentication...');
+    session = await getServerSession(authOptions);
     
-    const response = result.response;
-
-    if (response.candidates?.[0]?.content?.parts?.[0]?.functionCall) {
-      return NextResponse.json({
-        functionCall: response.candidates[0].content.parts[0].functionCall,
-        error: undefined
-      });
-    } else {
-      return NextResponse.json({  
-        response: response.text(),  
-        error: undefined  
-      });  
+    if (!session?.user) {
+      console.log('❌ Authentication failed - no session or user');
+      return NextResponse.json({ error: "Authentication required" }, { status: 401 });
     }
+    
+    console.log(`✅ Authentication successful for user: ${session.user.email}`);
+
+    // Parse request body
+    console.log('Parsing request body...');
+    const requestBody = await request.json();
+    const { topic, exam, subject, keyPoints, transcript } = requestBody;
+    
+    console.log('Request details:', {
+      topic,
+      exam,
+      subject,
+      hasKeyPoints: !!keyPoints,
+      transcriptLength: transcript?.length || 0,
+      userEmail: session.user.email
+    });
+    
+    // Validate required fields
+    console.log('Validating required fields...');
+    const missingFields = [];
+    if (!topic) missingFields.push('topic');
+    if (!exam) missingFields.push('exam');
+    if (!subject) missingFields.push('subject');
+    if (!transcript) missingFields.push('transcript');
+    
+    if (missingFields.length > 0) {
+      console.log(`❌ Missing required fields: ${missingFields.join(', ')}`);
+      return NextResponse.json({ error: "Missing required fields", missingFields }, { status: 400 });
+    }
+    
+    console.log('✅ All required fields present');
+
+    // Check API key
+    console.log('Checking GEMINI_API_KEY...');
+    const API_KEY = process.env.GEMINI_API_KEY;
+    if (!API_KEY) {
+      console.log('❌ GEMINI_API_KEY not set in environment variables');
+      return NextResponse.json({ error: "GEMINI_API_KEY not set" }, { status: 500 });
+    }
+    
+    console.log('✅ GEMINI_API_KEY found');
+
+    // Initialize Gemini AI
+    console.log('Initializing Gemini AI...');
+    const genAI = new GoogleGenerativeAI(API_KEY);  
+    const modelConfig = { 
+      model: "gemini-2.5-flash", 
+      tools: [analyzeFeynmanExplanationTool],
+      generationConfig: {
+        temperature: 0.1,
+        topP: 0.8,
+        topK: 40
+      }
+    };
+    const model = genAI.getGenerativeModel(modelConfig);  
+    console.log('✅ Gemini AI initialized with model:', modelConfig.model);
+    console.log('🔧 Tool configuration:', JSON.stringify(analyzeFeynmanExplanationTool, null, 2));
+
+    // Generate prompt
+    console.log('Generating Feynman prompt...');
+    const prompt = generateFeynmanPrompt(topic, exam, subject, keyPoints, transcript);
+    console.log('✅ Prompt generated, length:', prompt.length);
+    console.log('📤 PROMPT SENT TO GEMINI:', prompt);
+
+    // Make API call
+    console.log('Making Gemini API call...');
+    const apiCallStart = Date.now();
+    
+    const result = await model.generateContent([prompt]);  
+    const response = result.response;
+    
+    const apiCallDuration = Date.now() - apiCallStart;
+    console.log(`✅ API call completed in ${apiCallDuration}ms`);
+
+    // Process response
+    console.log('Processing API response...');
+    const responseText = response.text();
+    console.log('Response text length:', responseText.length);
+    console.log('📥 GEMINI RESPONSE:', responseText);
+    
+    // Debug response structure
+    console.log('🔍 RESPONSE STRUCTURE DEBUG:', {
+      hasCandidates: !!response.candidates,
+      candidatesLength: response.candidates?.length || 0,
+      hasContent: !!response.candidates?.[0]?.content,
+      hasParts: !!response.candidates?.[0]?.content?.parts,
+      partsLength: response.candidates?.[0]?.content?.parts?.length || 0,
+      hasFunctionCall: !!response.candidates?.[0]?.content?.parts?.[0]?.functionCall
+    });
+    
+    if (response.candidates?.[0]?.content?.parts?.[0]?.functionCall) {
+      console.log('✅ Function call detected in response');
+      const functionCall = response.candidates[0].content.parts[0].functionCall;
+      console.log('Function call details:', {
+        name: functionCall.name,
+        argsLength: functionCall.args ? Object.keys(functionCall.args).length : 0
+      });
+      console.log('📤 FUNCTION CALL SENT TO FRONTEND:', JSON.stringify(functionCall, null, 2));
+      
+      const totalDuration = Date.now() - startTime;
+      console.log(`=== FEYNMAN ANALYSIS REQUEST SUCCESS (${totalDuration}ms) ===`);
+      
+      const responseToFrontend = {
+        functionCall: functionCall,
+        error: undefined
+      };
+      console.log('📤 FINAL RESPONSE SENT TO FRONTEND:', JSON.stringify(responseToFrontend, null, 2));
+      
+      return NextResponse.json(responseToFrontend);
+    } else {
+      console.log('⚠️ No function call detected, falling back to text response');
+      console.log('✅ Regular text response received');
+      const totalDuration = Date.now() - startTime;
+      console.log(`=== FEYNMAN ANALYSIS REQUEST SUCCESS (${totalDuration}ms) ===`);
+      
+      const responseToFrontend = {  
+        response: responseText,  
+        error: undefined  
+      };
+      console.log('📤 FINAL RESPONSE SENT TO FRONTEND:', JSON.stringify(responseToFrontend, null, 2));
+      
+      return NextResponse.json(responseToFrontend);  
+    }
+    
   } catch (error) {  
-    console.error(error);
+    const totalDuration = Date.now() - startTime;
+    console.error(`=== FEYNMAN ANALYSIS REQUEST FAILED (${totalDuration}ms) ===`);
+    console.error('Error details:', {
+      message: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+      userEmail: session?.user?.email || 'unknown'
+    });
+    
     return NextResponse.json({  
-      error: error,
+      error: "Failed to process analysis request",
+      details: error instanceof Error ? error.message : 'Unknown error'
     }, { status: 500 });  
   }  
 } 
