@@ -10,8 +10,29 @@ interface FeynmanAnalysisProps {
   enabled?: boolean;
 }
 
+interface CoveredTopic {
+  topicName: string;
+  covered: boolean;
+}
+
+interface SideQuestion {
+  question: string;
+  answer: string;
+}
+
+interface FeynmanAnalysisResult {
+  coveredTopics: CoveredTopic[];
+  detailedAnalysis: string;
+  sideQuestions: SideQuestion[];
+  similarTopics: string[];
+  overallScore: number;
+}
+
 interface FeynmanApiResponse {
-  response?: string;
+  functionCall?: {
+    name: string;
+    args: FeynmanAnalysisResult;
+  };
   error?: unknown;
 }
 
@@ -34,9 +55,14 @@ export const useFetchFeynmanAnalysis = ({ topic, exam, subject, keyPoints, trans
     retry: 1,
   });
 
-  const analysisContent = geminiResponse?.response || null;
+  let analysisContent: FeynmanAnalysisResult | null = null;
 
   console.log("Gemini Response:", geminiResponse);
+
+  if (geminiResponse?.functionCall && geminiResponse.functionCall.name === 'analyzeFeynmanExplanation') {
+    analysisContent = geminiResponse.functionCall.args as FeynmanAnalysisResult;
+    console.log("Parsed Analysis Content:", analysisContent);
+  }
 
   return { analysisContent, isGeminiLoading, geminiError };
 };
