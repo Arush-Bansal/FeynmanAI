@@ -1,36 +1,32 @@
 'use client';
 
-import { useState } from "react";
+import { useQuery } from '@tanstack/react-query';
 import { backendApi } from '@/lib/axios';
 
-export interface GenerateResponse {
-  response: string | null;
-  loading: boolean;
-  error: string | null;
+interface UseGeminiGeneratorProps {
+  prompt: string;
+  enabled?: boolean;
 }
 
-export const useGeminiGenerator = () => {
-  const [response, setResponse] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+const generateContent = async (prompt: string) => {
+  if (!prompt) return null;
+  const res = await backendApi.post('/generate', { prompt });
+  return res.data.response;
+};
 
-  const generateContent = async (prompt: string) => {
-    setIsLoading(true);
-    setError(null);
-    
-    try {
-      const res = await backendApi.post('/generate', { prompt });
+export const useGeminiGenerator = ({ prompt, enabled = true }: UseGeminiGeneratorProps) => {
+  const {
+    data: response,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ['gemini-generator', prompt],
+    queryFn: () => generateContent(prompt),
+    enabled: enabled && !!prompt,
+    staleTime: Infinity,
+    gcTime: Infinity,
+    retry: 1,
+  });
 
-      setResponse(res.data.response || "");
-      return res.data.response; // Return the response directly
-    } catch (e: unknown) {
-      setError(`Failed to generate content. Please try again later. ${(e as Error).message}`);
-      setResponse(null);
-      return null; // Return null on error
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  return { response, isLoading, error, generateContent };
+  return { response, isLoading, error };
 };
