@@ -4,6 +4,7 @@ import { config } from 'dotenv';
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { analyzeFeynmanExplanationTool, generateFeynmanPrompt } from '@/features/gemini';
+import { dbConnect, createFeynmanAnalysis } from '@/features/db';
 
 // Load environment variables
 config();
@@ -61,6 +62,19 @@ export async function POST(request: Request) {
     const responseText = response.text();
     if (response.candidates?.[0]?.content?.parts?.[0]?.functionCall) {
       const functionCall = response.candidates[0].content.parts[0].functionCall;
+      const analysis = functionCall.args;
+
+      await dbConnect();
+      await createFeynmanAnalysis({
+        user: session.user.id,
+        topic,
+        exam,
+        subject,
+        keyPoints,
+        transcript,
+        analysis,
+      });
+
       const responseToFrontend = {
         functionCall: functionCall,
         error: undefined

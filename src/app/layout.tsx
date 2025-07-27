@@ -5,6 +5,7 @@ import { Navigation } from "@/components/Navigation";
 import { RouteProtection } from "@/features/route-protection/RouteProtection";
 import { SessionWrapper } from "@/components/SessionWrapper";
 import { ReactQueryProvider } from "@/components/ReactQueryProvider";
+import '@/lib/init-db';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

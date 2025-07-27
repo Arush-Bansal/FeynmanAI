@@ -27,14 +27,19 @@ export function Navigation() {
                 Loading...
               </Button>
             ) : session ? (
-              <Link href="/profile">
-                <img
-                  src={session.user?.image || "/default-avatar.svg"}
-                  alt="Profile"
-                  className="w-8 h-8 rounded-full cursor-pointer"
-                  onError={(e) => { e.currentTarget.src = "/default-avatar.svg"; }}
-                />
-              </Link>
+              <div className="flex items-center gap-4">
+                <Link href="/history">
+                  <Button variant="ghost">History</Button>
+                </Link>
+                <Link href="/profile">
+                  <img
+                    src={session.user?.image || "/default-avatar.svg"}
+                    alt="Profile"
+                    className="w-8 h-8 rounded-full cursor-pointer"
+                    onError={(e) => { e.currentTarget.src = "/default-avatar.svg"; }}
+                  />
+                </Link>
+              </div>
             ) : null}
           </div>
         </div>
