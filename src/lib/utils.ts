@@ -11,3 +11,11 @@ export function getSelectedExam(): string | null {
   const storedExam = localStorage.getItem('selectedExamCategory');
   return storedExam && EXAM_CATEGORIES.includes(storedExam as typeof EXAM_CATEGORIES[number]) ? storedExam : null;
 }
+
+export function clearUserData(): void {
+  if (typeof window === 'undefined') return;
+  
+  // Clear all user-related localStorage items
+  localStorage.removeItem('selectedExamCategory');
+  // Add any other user-related localStorage items here in the future
+}

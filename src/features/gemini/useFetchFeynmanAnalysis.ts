@@ -1,46 +1,68 @@
 import { useQuery } from '@tanstack/react-query';
-import { useGeminiGenerator } from './useGeminiGenerator';
+import { backendApi } from '@/lib/axios';
 
 interface FeynmanAnalysisProps {
   topic: string;
   exam: string;
   subject: string;
+  keyPoints: string[];
   transcript: string;
+  enabled?: boolean;
 }
 
-const generateFeynmanPrompt = (topic: string, exam: string, transcript: string) => {
-  const examContext = exam ? `for ${exam} preparation` : '';
-  return `You are an expert teacher using the Feynman Technique. Analyze this student's explanation of "${topic}" ${examContext}:
+interface CoveredTopic {
+  topicName: string;
+  covered: boolean;
+}
 
-Student's explanation: "${decodeURIComponent(transcript)}"
+interface SideQuestion {
+  question: string;
+  answer: string;
+}
 
-Please provide:
-1. **Strengths** (what they explained well)
-2. **Areas for Improvement** (what was unclear or missing)
-3. **Specific Feedback** (concrete suggestions to improve their understanding)
-4. **Key Concepts** they should focus on
-5. **A simple explanation** of the topic to help them understand better
+interface FeynmanAnalysisResult {
+  coveredTopics: CoveredTopic[];
+  detailedAnalysis: string;
+  sideQuestions: SideQuestion[];
+  similarTopics: string[];
+  overallScore: number;
+}
 
-Keep your response encouraging and constructive. Focus on helping them understand the concept better.`;
+interface FeynmanApiResponse {
+  functionCall?: {
+    name: string;
+    args: FeynmanAnalysisResult;
+  };
+  error?: unknown;
+}
+
+const fetchFeynmanAnalysis = async (params: FeynmanAnalysisProps): Promise<FeynmanApiResponse> => {
+  const res = await backendApi.post<FeynmanApiResponse>('/feynman-analysis', params);
+  return res.data;
 };
 
-const fetchAnalysisData = async (topic: string, exam: string, transcript: string, generateContent: (prompt: string) => Promise<string | null>) => {
-  const prompt = generateFeynmanPrompt(topic, exam, transcript);
-  const generated = await generateContent(prompt);
-  return generated;
-};
-
-export const useFetchFeynmanAnalysis = ({ topic, exam, subject, transcript }: FeynmanAnalysisProps) => {
-  const { generateContent } = useGeminiGenerator();
-
-  const { data: analysisContent, isLoading: isGeminiLoading, error: geminiError } = useQuery({
-    queryKey: ['feynmanAnalysis', topic, exam, subject, transcript],
-    queryFn: () => fetchAnalysisData(topic, exam, transcript, generateContent),
-    enabled: !!topic && !!exam && !!subject && !!transcript,
+export const useFetchFeynmanAnalysis = ({ topic, exam, subject, keyPoints, transcript, enabled = true }: FeynmanAnalysisProps) => {
+  const {
+    data: geminiResponse,
+    isLoading: isGeminiLoading,
+    error: geminiError,
+  } = useQuery<FeynmanApiResponse>({
+    queryKey: ['feynman-analysis', topic, exam, subject, keyPoints, transcript],
+    queryFn: () => fetchFeynmanAnalysis({ topic, exam, subject, keyPoints, transcript }),
+    enabled: enabled && !!topic && !!exam && !!subject && !!transcript,
     staleTime: Infinity,
     gcTime: Infinity,
-    retry: 1
+    retry: 1,
   });
+
+  let analysisContent: FeynmanAnalysisResult | null = null;
+
+  console.log("Gemini Response:", geminiResponse);
+
+  if (geminiResponse?.functionCall && geminiResponse.functionCall.name === 'analyzeFeynmanExplanation') {
+    analysisContent = geminiResponse.functionCall.args as FeynmanAnalysisResult;
+    console.log("Parsed Analysis Content:", analysisContent);
+  }
 
   return { analysisContent, isGeminiLoading, geminiError };
 };

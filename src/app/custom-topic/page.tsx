@@ -88,7 +88,7 @@ const CustomTopicPage = () => {
                 <div className="space-y-4">
                   <Button
                     onClick={handleBack}
-                    className="w-full bg-violet-600 hover:bg-violet-700"
+                    className="w-full bg-green-600 hover:bg-green-700"
                   >
                     <ArrowLeft className="h-4 w-4 mr-2" />
                     Request Another Topic
@@ -117,7 +117,7 @@ const CustomTopicPage = () => {
         <Card className="bg-gray-900/50 border-gray-700 backdrop-blur-sm shadow-2xl">
           <CardContent className="p-8">
             <div className="text-center mb-8">
-              <Lightbulb className="h-16 w-16 text-yellow-400 mx-auto mb-4" />
+              <Lightbulb className="h-16 w-16 text-green-400 mx-auto mb-4" />
               <h2 className="text-3xl font-bold text-white mb-4">Request Custom Topic</h2>
               <p className="text-gray-300 text-lg">
                 Can&apos;t find your topic? Let us know what you&apos;d like to practice!
@@ -135,7 +135,7 @@ const CustomTopicPage = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="your.email@example.com"
-                  className="w-full p-3 rounded-lg bg-gray-800 border border-gray-600 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500"
+                  className="w-full p-3 rounded-lg bg-gray-800 border border-gray-600 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500"
                   required
                   disabled={isLoading}
                 />
@@ -150,7 +150,7 @@ const CustomTopicPage = () => {
                   value={customTopic}
                   onChange={(e) => setCustomTopic(e.target.value)}
                   placeholder="Describe the topic you'd like to practice (e.g., 'Advanced Calculus', 'Shakespeare's Sonnets', 'Machine Learning Algorithms')"
-                  className="w-full h-32 p-3 rounded-lg bg-gray-800 border border-gray-600 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 resize-none"
+                  className="w-full h-32 p-3 rounded-lg bg-gray-800 border border-gray-600 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 resize-none"
                   required
                   disabled={isLoading}
                 />
@@ -158,7 +158,7 @@ const CustomTopicPage = () => {
 
               <Button
                 type="submit"
-                className="w-full h-14 text-lg font-semibold bg-violet-600 hover:bg-violet-700 transform hover:scale-105 transition-all duration-200 shadow-lg"
+                className="w-full h-14 text-lg font-semibold bg-green-600 hover:bg-green-700 transform hover:scale-105 transition-all duration-200 shadow-lg"
                 disabled={isLoading}
               >
                 {isLoading ? 'Submitting...' : 'Submit Request 📝'}

@@ -5,29 +5,29 @@ import { toast } from "sonner";
 import { useRouter } from 'next/navigation';
 import { Button } from "@/components/ui/button";
 import { Zap, BookOpen, GraduationCap } from "lucide-react";
+import { TOPIC_CONTENT } from '@/features/content-library/constants';
 
-interface TopicContent {
-  keyPoints: string[];
-  concepts: string;
-}
+// interface TopicContent {
+//   keyPoints: string[];
+//   concepts: string;
+// }
 
-interface ExamContent { 
-  [key: string]: TopicContent;
-}
+// interface ExamContent { 
+//   [key: string]: TopicContent;
+// }
 
-interface SubjectContent {
-  [key: string]: ExamContent;
-}
+// interface SubjectContent {
+//   [key: string]: ExamContent;
+// }
 
-interface TopicContentType {
-  [key: string]: SubjectContent;
-}
+// interface TopicContentType {
+//   [key: string]: SubjectContent;
+// }
 
 const SelectTopicPage = () => {
   const [topic, setTopic] = useState('');
   const [selectedExamCategory, setSelectedExamCategory] = useState<string | null>(null);
   const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
-  const [topicContent, setTopicContent] = useState<TopicContentType | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -39,19 +39,16 @@ const SelectTopicPage = () => {
     }
   }, []);
 
-  useEffect(() => {
-    // Dynamically import TOPIC_CONTENT to avoid serialization issues
-    import('@/features/content-library/constants').then((module) => {
-      setTopicContent(module.TOPIC_CONTENT);
-    });
-  }, []);
-
   const handleTopicSubmit = () => {
     if (!topic.trim() || !selectedExamCategory || !selectedSubject) {
       toast.error('Please select an exam, subject, and topic to practice!');
       return;
     }
-    router.push(`/practice?exam=${selectedExamCategory}&subject=${selectedSubject}&topic=${topic}`);
+
+    const selectedTopicContent = TOPIC_CONTENT[selectedExamCategory as keyof typeof TOPIC_CONTENT]?.[selectedSubject as keyof typeof TOPIC_CONTENT[keyof typeof TOPIC_CONTENT]]?.[topic];
+    const keyPoints = selectedTopicContent ? selectedTopicContent.keyPoints.join(',') : '';
+
+    router.push(`/practice?exam=${selectedExamCategory}&subject=${selectedSubject}&topic=${topic}${keyPoints ? `&keyPoints=${keyPoints}` : ''}`);
   };
 
   const handleTopicSelect = (selectedTopic: string) => {
@@ -69,20 +66,9 @@ const SelectTopicPage = () => {
     setTopic(''); // Clear selected topic when exam changes
   };
 
-  if (!topicContent) {
-    return (
-      <div className="w-full px-4 md:px-8 py-8">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto"></div>
-          <p className="text-gray-300 mt-4">Loading topics...</p>
-        </div>
-      </div>
-    );
-  }
-
-  const exams = Object.keys(topicContent);
-  const subjects = selectedExamCategory ? Object.keys(topicContent[selectedExamCategory]) : [];
-  const topics = (selectedExamCategory && selectedSubject) ? Object.keys(topicContent[selectedExamCategory][selectedSubject]) : [];
+  const exams = Object.keys(TOPIC_CONTENT);
+  const subjects = selectedExamCategory ? Object.keys(TOPIC_CONTENT[selectedExamCategory as keyof typeof TOPIC_CONTENT]) : [];
+  const topics = (selectedExamCategory && selectedSubject) ? Object.keys(TOPIC_CONTENT[selectedExamCategory as keyof typeof TOPIC_CONTENT][selectedSubject as keyof typeof TOPIC_CONTENT[keyof typeof TOPIC_CONTENT]]) : [];
 
   return (
     <div className="w-full px-4 md:px-8 py-8">
@@ -96,7 +82,7 @@ const SelectTopicPage = () => {
       {!selectedExamCategory && (
         <div className="mb-8">
           <div className="flex items-center gap-2 mb-4">
-            <BookOpen className="h-5 w-5 text-violet-400" />
+            <BookOpen className="h-5 w-5 text-green-400" />
             <h3 className="text-xl font-semibold text-white">Choose Your Exam</h3>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4 mb-6">
@@ -106,7 +92,7 @@ const SelectTopicPage = () => {
                 variant="outline"
                 className={`w-full h-auto py-2 px-3 text-left text-lg font-semibold rounded-lg transition-all duration-200 ease-in-out transform hover:scale-105
                   ${selectedExamCategory === examName
-                    ? 'bg-violet-600 text-white border-violet-600 shadow-lg'
+                    ? 'bg-green-600 text-white border-green-600 shadow-lg'
                     : 'bg-gray-800 text-gray-200 border-gray-700 hover:bg-gray-700 hover:border-gray-600'
                   }`}
                 onClick={() => handleExamSelect(examName)}
@@ -122,7 +108,7 @@ const SelectTopicPage = () => {
       {selectedExamCategory && (
         <div className="mb-8">
           <div className="flex items-center gap-2 mb-4">
-            <BookOpen className="h-5 w-5 text-violet-400" />
+            <BookOpen className="h-5 w-5 text-green-400" />
             <h3 className="text-xl font-semibold text-white">Choose Your Subject for {selectedExamCategory}</h3>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
@@ -132,7 +118,7 @@ const SelectTopicPage = () => {
                 variant="outline"
                 className={`w-full h-auto py-2 px-3 text-left text-lg font-semibold rounded-lg transition-all duration-200 ease-in-out transform hover:scale-105
                   ${selectedSubject === subjectName
-                    ? 'bg-violet-600 text-white border-violet-600 shadow-lg'
+                    ? 'bg-green-600 text-white border-green-600 shadow-lg'
                     : 'bg-gray-800 text-gray-200 border-gray-700 hover:bg-gray-700 hover:border-gray-600'
                   }`}
                 onClick={() => handleSubjectSelect(subjectName)}
@@ -148,7 +134,7 @@ const SelectTopicPage = () => {
       {selectedExamCategory && selectedSubject && (
         <div className="mb-8">
           <div className="flex items-center gap-2 mb-4">
-            <BookOpen className="h-5 w-5 text-violet-400" />
+            <BookOpen className="h-5 w-5 text-green-400" />
             <h3 className="text-xl font-semibold text-white">Choose Your Topic for {selectedSubject}</h3>
           </div>
 
@@ -160,11 +146,11 @@ const SelectTopicPage = () => {
                 <Button
                   key={topicName}
                   variant="outline"
-                  className={`w-full h-auto py-2 px-3 text-left text-lg font-semibold rounded-lg transition-all duration-200 ease-in-out transform hover:scale-105
-                    ${topic === topicName
-                      ? 'bg-violet-600 text-white border-violet-600 shadow-lg'
-                      : 'bg-gray-800 text-gray-200 border-gray-700 hover:bg-gray-700 hover:border-gray-600'
-                    }`}
+                                  className={`w-full h-auto py-2 px-3 text-left text-lg font-semibold rounded-lg transition-all duration-200 ease-in-out transform hover:scale-105
+                  ${topic === topicName
+                    ? 'bg-green-600 text-white border-green-600 shadow-lg'
+                    : 'bg-gray-800 text-gray-200 border-gray-700 hover:bg-gray-700 hover:border-gray-600'
+                  }`}
                   onClick={() => handleTopicSelect(topicName)}
                 >
                   {topicName}
