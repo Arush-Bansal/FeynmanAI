@@ -49,7 +49,7 @@ const ExamSelectionPage = () => {
 
   return (
     
-      <div className="flex flex-col h-screen w-full">
+      <div className="flex flex-row h-screen w-full overflow-hidden">
         {EXAM_CATEGORIES.map((exam) => {
           const config = getExamConfig(exam);
           return (

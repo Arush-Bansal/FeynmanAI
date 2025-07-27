@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { LogOut } from "lucide-react";
 
 import { EXAM_CATEGORIES } from "@/features/content-library";
+import { clearUserData } from "@/lib/utils";
 
 const ProfilePage = () => {
   const { data: session } = useSession();
@@ -23,6 +24,12 @@ const ProfilePage = () => {
   const handleExamSelect = (exam: string) => {
     setSelectedExam(exam);
     localStorage.setItem('selectedExamCategory', exam);
+  };
+
+  const handleSignOut = () => {
+    // Clear localStorage before signing out
+    clearUserData();
+    signOut({ callbackUrl: "/" });
   };
 
   return (
@@ -46,7 +53,7 @@ const ProfilePage = () => {
             <p className="text-lg text-gray-300">{session?.user?.email}</p>
             <Button
               variant="outline"
-              onClick={() => signOut()}
+              onClick={handleSignOut}
               className="mt-4 border-gray-600 text-white hover:bg-gray-800 text-red-500 hover:text-white"
             >
               <LogOut className="h-4 w-4 mr-2 text-red-500 hover:text-white" />
@@ -66,7 +73,7 @@ const ProfilePage = () => {
               variant={selectedExam === exam ? "default" : "secondary"}
               className={`cursor-pointer text-lg px-4 py-2 ${
                 selectedExam === exam 
-                  ? 'bg-green-600 text-white' 
+                  ? 'bg-green-600 text-white hover:bg-gray-600 hover:text-white' 
                   : 'bg-gray-800 text-gray-300 hover:bg-gray-700 border-gray-600'
               }`}
               onClick={() => handleExamSelect(exam)}

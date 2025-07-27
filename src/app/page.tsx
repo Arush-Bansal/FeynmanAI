@@ -127,7 +127,7 @@ export default function Home() {
                       </svg>
                       Get Started
                     </Button>
-                    <Link href="/practice">
+                    <Link href="/">
                       <Button variant="outline" size="lg" className="text-lg px-8 border-green-500/20 text-green-400 hover:bg-green-500/10">
                         Watch Demo
                       </Button>
@@ -297,7 +297,7 @@ export default function Home() {
                   </svg>
                   Get Started Now
                 </Button>
-                <Link href="/practice">
+                <Link href="/">
                   <Button variant="outline" size="lg" className="text-lg px-8 border-green-500/20 text-green-400 hover:bg-green-500/10">
                     Watch Demo
                   </Button>

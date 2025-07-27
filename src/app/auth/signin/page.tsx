@@ -20,7 +20,7 @@ export default function SignIn() {
   if (status === "loading") {
     return (
       <div className="min-h-screen bg-gray-950 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-violet-400"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-400"></div>
       </div>
     )
   }
@@ -37,7 +37,7 @@ export default function SignIn() {
         <Card className="bg-gray-900/50 border-gray-700 backdrop-blur-sm">
           <CardHeader className="text-center">
             <div className="flex justify-center mb-4">
-              <Brain className="h-12 w-12 text-violet-400" />
+              <Brain className="h-12 w-12 text-green-400" />
             </div>
             <CardTitle className="text-2xl font-bold text-white">
               Welcome to Feynman
