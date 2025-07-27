@@ -2,7 +2,7 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import { NextResponse } from 'next/server';  
 import { config } from 'dotenv';
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth";
 import { analyzeFeynmanExplanationTool, generateFeynmanPrompt } from '@/features/gemini';
 
 // Load environment variables
