@@ -6,6 +6,8 @@ export interface IUser extends Document {
   email: string;
   image?: string;
   emailVerified?: Date;
+  role: 'user' | 'admin' | 'superadmin';
+  isActive: boolean;
   preferences: {
     defaultExam?: string;
     notificationSettings: {
@@ -41,6 +43,15 @@ const UserSchema: Schema = new Schema(
     },
     image: String,
     emailVerified: Date,
+    role: {
+      type: String,
+      enum: ['user', 'admin', 'superadmin'],
+      default: 'user',
+    },
+    isActive: {
+      type: Boolean,
+      default: true,
+    },
     preferences: {
       defaultExam: String,
       notificationSettings: {

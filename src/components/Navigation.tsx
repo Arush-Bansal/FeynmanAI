@@ -3,10 +3,12 @@ import { Brain } from "lucide-react";
 import Link from 'next/link';
 import Image from 'next/image';
 import { useSession } from "next-auth/react"
+import { usePathname } from 'next/navigation';
 import { Button } from "@/components/ui/button"
 
 export function Navigation() {
   const { data: session, status } = useSession();
+  const pathname = usePathname();
 
   return (
     <header className="border-b border-border/50 bg-background/50 backdrop-blur-sm sticky top-0 z-50">
@@ -30,7 +32,15 @@ export function Navigation() {
             ) : session ? (
               <div className="flex items-center gap-4">
                 <Link href="/history">
-                  <Button variant="ghost">History</Button>
+                  <Button 
+                    variant={pathname === '/history' ? 'default' : 'ghost'}
+                    className={pathname === '/history' 
+                      ? 'bg-green-600 text-white hover:bg-green-700' 
+                      : 'text-white hover:bg-gray-800 hover:text-white'
+                    }
+                  >
+                    History
+                  </Button>
                 </Link>
                 <Link href="/profile">
                   <Image

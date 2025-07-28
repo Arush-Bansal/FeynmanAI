@@ -1,8 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { 
   getExamsForSelection, 
-  getExamCategories,
-  ExamData 
+  getExamCategories 
 } from '../services/contentService';
 import { getExamByCode } from '../data/client';
 import { 
