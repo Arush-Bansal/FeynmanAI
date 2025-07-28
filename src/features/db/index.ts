@@ -1,5 +1,8 @@
-export { default as dbConnect } from './dbConnect';
-export { default as User } from './models/User';
-export { default as FeynmanAnalysis } from './models/FeynmanAnalysis';
+export * from './dbConnect';
+export * from './models';
+export * from './data';
+
 export * from './data/users';
-export * from './data/feynmanAnalyses';
+export * from './init-db';
+export * from './services/contentService';
+export * from './hooks';
