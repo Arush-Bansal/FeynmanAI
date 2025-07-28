@@ -1,4 +1,4 @@
-import { Topic } from "@/features/db";
+import { Topic } from "@/features/db/models/Topic";
 import { ITopic } from "@/features/db/models/Topic";
 
 export const getTopicsBySubject = async (subjectId: string) => {

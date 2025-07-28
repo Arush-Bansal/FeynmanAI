@@ -3,27 +3,39 @@ import { useSession, signOut } from "next-auth/react";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { LogOut } from "lucide-react";
-
-import { EXAM_CATEGORIES } from "@/features/content-library";
+import { LogOut, Loader2 } from "lucide-react";
+import { useExamSelection } from '@/hooks/useExamSelection';
 import { clearUserData } from "@/lib/utils";
 
 const ProfilePage = () => {
   const { data: session } = useSession();
   const [selectedExam, setSelectedExam] = useState<string | null>(null);
+  const { exams, isLoadingExams, userPreference, selectExam } = useExamSelection();
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const storedExam = localStorage.getItem('selectedExamCategory');
-      if (storedExam && EXAM_CATEGORIES.includes(storedExam as typeof EXAM_CATEGORIES[number])) {
+      if (storedExam) {
         setSelectedExam(storedExam);
       }
     }
   }, []);
 
-  const handleExamSelect = (exam: string) => {
-    setSelectedExam(exam);
-    localStorage.setItem('selectedExamCategory', exam);
+  // Update selected exam when user preference changes
+  useEffect(() => {
+    if (userPreference?.currentExam) {
+      setSelectedExam(userPreference.currentExam);
+    }
+  }, [userPreference]);
+
+  const handleExamSelect = async (examCode: string) => {
+    try {
+      await selectExam(examCode);
+      setSelectedExam(examCode);
+      localStorage.setItem('selectedExamCategory', examCode);
+    } catch (error) {
+      console.error('Error selecting exam:', error);
+    }
   };
 
   const handleSignOut = () => {
@@ -31,6 +43,17 @@ const ProfilePage = () => {
     clearUserData();
     signOut({ callbackUrl: "/" });
   };
+
+  if (isLoadingExams) {
+    return (
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin text-green-400 mx-auto mb-4" />
+          <p className="text-gray-300">Loading profile...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -67,18 +90,18 @@ const ProfilePage = () => {
         <h2 className="text-2xl font-bold text-white mb-4">Exam Preparation</h2>
         <p className="text-gray-300 mb-4">Choose the exam you are preparing for:</p>
         <div className="flex flex-wrap gap-3">
-          {EXAM_CATEGORIES.map((exam) => (
+          {exams.map((exam) => (
             <Badge
-              key={exam}
-              variant={selectedExam === exam ? "default" : "secondary"}
+              key={exam._id}
+              variant={selectedExam === exam.code ? "default" : "secondary"}
               className={`cursor-pointer text-lg px-4 py-2 ${
-                selectedExam === exam 
+                selectedExam === exam.code 
                   ? 'bg-green-600 text-white hover:bg-gray-600 hover:text-white' 
                   : 'bg-gray-800 text-gray-300 hover:bg-gray-700 border-gray-600'
               }`}
-              onClick={() => handleExamSelect(exam)}
+              onClick={() => handleExamSelect(exam.code)}
             >
-              {exam}
+              {exam.name}
             </Badge>
           ))}
         </div>

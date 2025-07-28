@@ -1,4 +1,4 @@
-import { Exam, IExam } from "@/features/db";
+import { Exam, IExam } from "@/features/db/models/Exam";
 
 export const getAllExams = async () => {
   return await Exam.find().sort({ name: 1 });

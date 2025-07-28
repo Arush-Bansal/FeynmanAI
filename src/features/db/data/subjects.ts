@@ -1,4 +1,4 @@
-import { Subject } from "@/features/db";
+import { Subject } from "@/features/db/models/Subject";
 import { ISubject } from "@/features/db/models/Subject";
 
 export const getSubjectsByExam = async (examId: string) => {

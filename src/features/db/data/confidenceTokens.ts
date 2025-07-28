@@ -1,4 +1,4 @@
-import { ConfidenceToken, IConfidenceToken } from "@/features/db";
+import { ConfidenceToken, IConfidenceToken } from "@/features/db/models/ConfidenceToken";
 
 export const getConfidenceToken = async (userId: string, entityType: string, entityId: string) => {
   return await ConfidenceToken.findOne({

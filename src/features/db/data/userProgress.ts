@@ -1,4 +1,4 @@
-import { UserProgress } from "@/features/db";
+import { UserProgress } from "@/features/db/models/UserProgress";
 import { IUserProgress } from "@/features/db/models/UserProgress";
 
 export const getUserProgress = async (userId: string, conceptId: string) => {

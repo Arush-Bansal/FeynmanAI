@@ -1,4 +1,4 @@
-import { CustomConcept } from "@/features/db";
+import { CustomConcept } from "@/features/db/models/CustomConcept";
 import { ICustomConcept } from "@/features/db/models/CustomConcept";
 
 export const getCustomConceptsByUser = async (userId: string) => {

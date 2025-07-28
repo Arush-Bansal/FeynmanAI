@@ -1,4 +1,4 @@
-import { CustomSubtopic, ICustomSubtopic } from "@/features/db";
+import { CustomSubtopic, ICustomSubtopic } from "@/features/db/models/CustomSubtopic";
 
 export const getCustomSubtopicsByUser = async (userId: string) => {
   return await CustomSubtopic.find({ createdBy: userId }).sort({ createdAt: -1 });

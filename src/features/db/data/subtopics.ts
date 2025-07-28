@@ -1,4 +1,4 @@
-import { Subtopic } from "@/features/db";
+import { Subtopic } from "@/features/db/models/Subtopic";
 // import { ISubtopic } from "@/features/db/models/Subtopic";
 // import { ITopic } from "@/features/db/models/Topic";
 import { ISubtopic } from "@/features/db/models/Subtopic";

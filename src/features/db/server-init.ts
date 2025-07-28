@@ -2,6 +2,7 @@
 
 import dbConnect from './dbConnect';
 import { getExamCategories } from './services/contentService';
+import { seedExams } from './seed-exams';
 
 // Server action for database initialization
 export async function initializeDatabaseAction() {
@@ -9,6 +10,10 @@ export async function initializeDatabaseAction() {
     console.log('🔌 Initializing database connection via server action...');
     await dbConnect();
     console.log('✅ Database initialized successfully via server action');
+    
+    // Seed exams if they don't exist
+    await seedExams();
+    
     return { success: true };
   } catch (error) {
     console.error('❌ Failed to initialize database via server action:', error);

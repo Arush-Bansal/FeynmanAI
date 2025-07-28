@@ -4,31 +4,55 @@ import { useState, useEffect } from 'react';
 import { toast } from "sonner";
 import { useRouter } from 'next/navigation';
 import { Button } from "@/components/ui/button";
-import { Zap, BookOpen, GraduationCap } from "lucide-react";
-import { TOPIC_CONTENT } from '@/features/content-library/constants';
+import { Zap, BookOpen, GraduationCap, Loader2 } from "lucide-react";
+import { useExamSelection } from '@/hooks/useExamSelection';
+import { useSubjects, useTopics } from '@/hooks/useContentSelection';
+import { useTopicContent } from '@/hooks/useTopicContent';
 
-// interface TopicContent {
-//   keyPoints: string[];
-//   concepts: string;
-// }
+interface Subject {
+  _id: string;
+  name: string;
+  code: string;
+  description: string;
+  exam: string;
+}
 
-// interface ExamContent { 
-//   [key: string]: TopicContent;
-// }
-
-// interface SubjectContent {
-//   [key: string]: ExamContent;
-// }
-
-// interface TopicContentType {
-//   [key: string]: SubjectContent;
-// }
+interface Topic {
+  _id: string;
+  name: string;
+  code: string;
+  description: string;
+  subject: string;
+}
 
 const SelectTopicPage = () => {
   const [topic, setTopic] = useState('');
   const [selectedExamCategory, setSelectedExamCategory] = useState<string | null>(null);
   const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
   const router = useRouter();
+
+  const { exams, isLoadingExams } = useExamSelection();
+
+  // Get subjects for selected exam
+  const {
+    data: subjects = [],
+    isLoading: isLoadingSubjects,
+    error: subjectsError,
+  } = useSubjects(selectedExamCategory);
+
+  // Get topics for selected subject
+  const {
+    data: topics = [],
+    isLoading: isLoadingTopics,
+    error: topicsError,
+  } = useTopics(selectedSubject);
+
+  // Get topic content for selected topic
+  const selectedSubjectData = subjects.find((s: Subject) => s._id === selectedSubject);
+  const selectedTopicData = topics.find((t: Topic) => t._id === topic);
+  const {
+    data: topicContent
+  } = useTopicContent(selectedExamCategory, selectedSubjectData?.name || null, selectedTopicData?.name || null);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -45,18 +69,25 @@ const SelectTopicPage = () => {
       return;
     }
 
-    const selectedTopicContent = TOPIC_CONTENT[selectedExamCategory as keyof typeof TOPIC_CONTENT]?.[selectedSubject as keyof typeof TOPIC_CONTENT[keyof typeof TOPIC_CONTENT]]?.[topic];
-    const keyPoints = selectedTopicContent ? selectedTopicContent.keyPoints.join(',') : '';
+    // Get the selected topic data
+    const selectedTopic = topics.find((t: Topic) => t._id === topic);
+    if (!selectedTopic) {
+      toast.error('Selected topic not found');
+      return;
+    }
 
-    router.push(`/practice?exam=${selectedExamCategory}&subject=${selectedSubject}&topic=${topic}${keyPoints ? `&keyPoints=${keyPoints}` : ''}`);
+    // Use topic content for key points if available
+    const keyPoints = topicContent?.content?.keyPoints || [selectedTopic.name];
+
+    router.push(`/practice?exam=${selectedExamCategory}&subject=${selectedSubject}&topic=${selectedTopic.name}${keyPoints ? `&keyPoints=${keyPoints.join(',')}` : ''}`);
   };
 
-  const handleTopicSelect = (selectedTopic: string) => {
-    setTopic(selectedTopic);
+  const handleTopicSelect = (topicId: string) => {
+    setTopic(topicId);
   };
 
-  const handleSubjectSelect = (subject: string) => {
-    setSelectedSubject(subject);
+  const handleSubjectSelect = (subjectId: string) => {
+    setSelectedSubject(subjectId);
     setTopic(''); // Clear selected topic when subject changes
   };
 
@@ -66,9 +97,16 @@ const SelectTopicPage = () => {
     setTopic(''); // Clear selected topic when exam changes
   };
 
-  const exams = Object.keys(TOPIC_CONTENT);
-  const subjects = selectedExamCategory ? Object.keys(TOPIC_CONTENT[selectedExamCategory as keyof typeof TOPIC_CONTENT]) : [];
-  const topics = (selectedExamCategory && selectedSubject) ? Object.keys(TOPIC_CONTENT[selectedExamCategory as keyof typeof TOPIC_CONTENT][selectedSubject as keyof typeof TOPIC_CONTENT[keyof typeof TOPIC_CONTENT]]) : [];
+  if (isLoadingExams) {
+    return (
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin text-green-400 mx-auto mb-4" />
+          <p className="text-gray-300">Loading exams...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full px-4 md:px-8 py-8">
@@ -86,18 +124,18 @@ const SelectTopicPage = () => {
             <h3 className="text-xl font-semibold text-white">Choose Your Exam</h3>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4 mb-6">
-            {exams.map((examName) => (
+            {exams.map((exam) => (
               <Button
-                key={examName}
+                key={exam._id}
                 variant="outline"
                 className={`w-full h-auto py-2 px-3 text-left text-lg font-semibold rounded-lg transition-all duration-200 ease-in-out transform hover:scale-105
-                  ${selectedExamCategory === examName
+                  ${selectedExamCategory === exam.code
                     ? 'bg-green-600 text-white border-green-600 shadow-lg'
                     : 'bg-gray-800 text-gray-200 border-gray-700 hover:bg-gray-700 hover:border-gray-600'
                   }`}
-                onClick={() => handleExamSelect(examName)}
+                onClick={() => handleExamSelect(exam.code)}
               >
-                {examName}
+                {exam.name}
               </Button>
             ))}
           </div>
@@ -111,22 +149,33 @@ const SelectTopicPage = () => {
             <BookOpen className="h-5 w-5 text-green-400" />
             <h3 className="text-xl font-semibold text-white">Choose Your Subject for {selectedExamCategory}</h3>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-            {subjects.map((subjectName) => (
-              <Button
-                key={subjectName}
-                variant="outline"
-                className={`w-full h-auto py-2 px-3 text-left text-lg font-semibold rounded-lg transition-all duration-200 ease-in-out transform hover:scale-105
-                  ${selectedSubject === subjectName
-                    ? 'bg-green-600 text-white border-green-600 shadow-lg'
-                    : 'bg-gray-800 text-gray-200 border-gray-700 hover:bg-gray-700 hover:border-gray-600'
-                  }`}
-                onClick={() => handleSubjectSelect(subjectName)}
-              >
-                {subjectName}
-              </Button>
-            ))}
-          </div>
+          {isLoadingSubjects ? (
+            <div className="flex items-center justify-center py-8">
+              <Loader2 className="h-6 w-6 animate-spin text-green-400 mr-2" />
+              <span className="text-gray-300">Loading subjects...</span>
+            </div>
+          ) : subjectsError ? (
+            <div className="text-red-400 text-center py-4">
+              Failed to load subjects. Please try again.
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+              {subjects.map((subject: Subject) => (
+                <Button
+                  key={subject._id}
+                  variant="outline"
+                  className={`w-full h-auto py-2 px-3 text-left text-lg font-semibold rounded-lg transition-all duration-200 ease-in-out transform hover:scale-105
+                    ${selectedSubject === subject._id
+                      ? 'bg-green-600 text-white border-green-600 shadow-lg'
+                      : 'bg-gray-800 text-gray-200 border-gray-700 hover:bg-gray-700 hover:border-gray-600'
+                    }`}
+                  onClick={() => handleSubjectSelect(subject._id)}
+                >
+                  {subject.name}
+                </Button>
+              ))}
+            </div>
+          )}
         </div>
       )}
 
@@ -134,65 +183,50 @@ const SelectTopicPage = () => {
       {selectedExamCategory && selectedSubject && (
         <div className="mb-8">
           <div className="flex items-center gap-2 mb-4">
-            <BookOpen className="h-5 w-5 text-green-400" />
+            <GraduationCap className="h-5 w-5 text-green-400" />
             <h3 className="text-xl font-semibold text-white">Choose Your Topic for {selectedSubject}</h3>
           </div>
-
-          {/* Topics Grid */}
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-300 mb-3">Select Topic:</label>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4">
-              {topics.map((topicName: string) => (
+          {isLoadingTopics ? (
+            <div className="flex items-center justify-center py-8">
+              <Loader2 className="h-6 w-6 animate-spin text-green-400 mr-2" />
+              <span className="text-gray-300">Loading topics...</span>
+            </div>
+          ) : topicsError ? (
+            <div className="text-red-400 text-center py-4">
+              Failed to load topics. Please try again.
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+              {topics.map((topicItem: Topic) => (
                 <Button
-                  key={topicName}
+                  key={topicItem._id}
                   variant="outline"
-                                  className={`w-full h-auto py-2 px-3 text-left text-lg font-semibold rounded-lg transition-all duration-200 ease-in-out transform hover:scale-105
-                  ${topic === topicName
-                    ? 'bg-green-600 text-white border-green-600 shadow-lg'
-                    : 'bg-gray-800 text-gray-200 border-gray-700 hover:bg-gray-700 hover:border-gray-600'
-                  }`}
-                  onClick={() => handleTopicSelect(topicName)}
+                  className={`w-full h-auto py-2 px-3 text-left text-lg font-semibold rounded-lg transition-all duration-200 ease-in-out transform hover:scale-105
+                    ${topic === topicItem._id
+                      ? 'bg-green-600 text-white border-green-600 shadow-lg'
+                      : 'bg-gray-800 text-gray-200 border-gray-700 hover:bg-gray-700 hover:border-gray-600'
+                    }`}
+                  onClick={() => handleTopicSelect(topicItem._id)}
                 >
-                  {topicName}
+                  {topicItem.name}
                 </Button>
               ))}
             </div>
-          </div>
+          )}
         </div>
       )}
 
-      {!selectedExamCategory && (
-        <p className="text-gray-400 text-left">Please select an exam to see subjects.</p>
-      )}
-      {!selectedSubject && selectedExamCategory && (
-        <p className="text-gray-400 text-left">Please select a subject to see topics.</p>
-      )}
-
-      {/* Selected Topic Display */}
-      {topic && (
-        <div className="mb-6 p-4 bg-green-600/20 border border-green-600/30 rounded-lg">
-          <div className="flex items-center gap-2 mb-2">
-            <GraduationCap className="h-5 w-5 text-green-400" />
-            <span className="text-sm font-medium text-green-300">Selected Topic:</span>
-          </div>
-          <p className="text-white font-semibold text-lg">{topic}</p>
+      {/* Submit Button */}
+      {selectedExamCategory && selectedSubject && topic && (
+        <div className="flex justify-center">
+          <Button
+            onClick={handleTopicSubmit}
+            className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 text-lg font-semibold rounded-lg transition-all duration-200 transform hover:scale-105"
+          >
+            Start Practice Session
+          </Button>
         </div>
       )}
-      
-      <div className="flex justify-end">
-        <Button 
-          onClick={handleTopicSubmit}
-          disabled={!topic.trim() || !selectedExamCategory || !selectedSubject}
-          className="w-full sm:w-auto h-14 text-lg font-semibold bg-green-600 hover:bg-green-700 transform hover:scale-105 transition-all duration-200 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          Let&apos;s Practice! 🚀
-        </Button>
-      </div>
-
-      {/* Custom Topic Link */}
-      <div className="mt-6 text-left">
-        <p className="text-gray-400 text-sm">Can&apos;t find your topic? <a href="/custom-topic" className="text-blue-400 hover:text-blue-300 text-sm underline">Request Custom Topic</a></p>
-      </div>
     </div>
   );
 };

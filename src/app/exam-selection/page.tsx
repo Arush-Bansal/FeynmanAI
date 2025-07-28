@@ -4,53 +4,87 @@ import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import Image from 'next/image';
 import { Card, CardContent } from '@/components/ui/card';
-import { BookOpen, GraduationCap } from 'lucide-react';
-
-import { EXAM_CATEGORIES } from '@/features/content-library';
+import { BookOpen, GraduationCap, Loader2 } from 'lucide-react';
+import { useExamSelection } from '@/hooks/useExamSelection';
 
 const ExamSelectionPage = () => {
   const router = useRouter();
+  const { 
+    exams, 
+    isLoadingExams, 
+    examsError, 
+    userPreference, 
+    isLoadingPreference,
+    selectExam, 
+    isUpdating 
+  } = useExamSelection();
 
-  const handleExamSelect = (exam: string) => {
-    localStorage.setItem('selectedExamCategory', exam);
-    router.push('/select-topic');
+  const handleExamSelect = async (examCode: string) => {
+    try {
+      await selectExam(examCode);
+      localStorage.setItem('selectedExamCategory', examCode);
+      router.push('/select-topic');
+    } catch (error) {
+      console.error('Error selecting exam:', error);
+    }
   };
 
   // Optional: Redirect if exam is already selected
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const storedExam = localStorage.getItem('selectedExamCategory');
-      if (storedExam) {
+      if (storedExam && userPreference?.currentExam === storedExam) {
         // router.push('/select-topic'); // Uncomment if you want to skip this page if exam is already selected
       }
     }
-  }, []);
+  }, [userPreference]);
 
-  const getExamConfig = (exam: string) => {
-    switch (exam) {
-      case 'JEE':
-        return {
-          icon: '/images/jee-icon.svg',
-          description: 'Engineering Entrance',
-          color: 'text-blue-400',
-          bgColor: 'bg-blue-600',
-        };
-      case 'NEET':
-        return {
-          icon: '/images/neet-icon.svg',
-          description: 'Medical Entrance',
-          color: 'text-green-400',
-          bgColor: 'bg-green-600',
-        };
-      default:
-        return {
-          icon: '/images/upsc-icon.svg',
-          description: 'Civil Services',
-          color: 'text-purple-400',
-          bgColor: 'bg-purple-600',
-        };
-    }
-  };
+  // const getExamConfig = (examCode: string) => {
+  //   switch (examCode) {
+  //     case 'JEE':
+  //       return {
+  //         color: 'text-blue-400',
+  //         bgColor: 'bg-blue-600',
+  //       };
+  //     case 'NEET':
+  //       return {
+  //         color: 'text-green-400',
+  //         bgColor: 'bg-green-600',
+  //       };
+  //     default:
+  //       return {
+  //         color: 'text-purple-400',
+  //         bgColor: 'bg-purple-600',
+  //       };
+  //   }
+  // };
+
+  if (isLoadingExams || isLoadingPreference) {
+    return (
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin text-green-400 mx-auto mb-4" />
+          <p className="text-gray-300">Loading exams...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (examsError) {
+    return (
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-400 mb-4">Failed to load exams</p>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="text-green-400 hover:text-green-300"
+          >
+            Try again
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-black text-white p-4 md:p-8">
@@ -72,32 +106,38 @@ const ExamSelectionPage = () => {
 
         {/* Exam Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-          {EXAM_CATEGORIES.map((exam) => {
-            const config = getExamConfig(exam);
+          {exams.map((exam) => {
+            // const config = getExamConfig(exam.code);
+            const isSelected = userPreference?.currentExam === exam.code;
+            
             return (
               <Card 
-                key={exam}
-                className="bg-gray-900/50 border-gray-700 backdrop-blur-sm hover:bg-gray-900/70 transition-all duration-300 cursor-pointer group shadow-lg hover:shadow-xl"
-                onClick={() => handleExamSelect(exam)}
+                key={exam._id}
+                className={`bg-gray-900/50 border-gray-700 backdrop-blur-sm hover:bg-gray-900/70 transition-all duration-300 cursor-pointer group shadow-lg hover:shadow-xl ${
+                  isSelected ? 'ring-2 ring-green-400/50' : ''
+                }`}
+                onClick={() => handleExamSelect(exam.code)}
               >
                 <CardContent className="p-8 text-center">
                   <div className="flex justify-center mb-6">
                     <div className="w-24 h-24 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                       <Image 
-                        src={config.icon} 
-                        alt={`${exam} Icon`} 
+                        src={exam.icon} 
+                        alt={`${exam.name} Icon`} 
                         width={48} 
                         height={48} 
                       />
                     </div>
                   </div>
                   
-                  <h2 className="text-3xl font-bold text-white mb-3">{exam}</h2>
-                  <p className="text-gray-300 text-lg mb-6">{config.description}</p>
+                  <h2 className="text-3xl font-bold text-white mb-3">{exam.name}</h2>
+                  <p className="text-gray-300 text-lg mb-6">{exam.description}</p>
                   
                   <div className="flex items-center justify-center gap-2 text-sm text-gray-400">
                     <GraduationCap className="h-4 w-4" />
-                    <span>Click to continue</span>
+                    <span>
+                      {isUpdating ? 'Updating...' : isSelected ? 'Currently selected' : 'Click to continue'}
+                    </span>
                   </div>
                 </CardContent>
               </Card>

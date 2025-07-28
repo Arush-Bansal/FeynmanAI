@@ -1,4 +1,4 @@
-import { User } from "@/features/db";
+import { User } from "@/features/db/models/User";
 import { IUser } from "@/features/db/models/User";
 
 export const getUserByEmail = async (email: string) => {

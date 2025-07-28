@@ -1,4 +1,4 @@
-import { Concept, IConcept } from "@/features/db";
+import { Concept, IConcept } from "@/features/db/models/Concept";
 
 export const getConceptsBySubtopic = async (subtopicId: string) => {
   return await Concept.find({ subtopic: subtopicId }).sort({ name: 1 });

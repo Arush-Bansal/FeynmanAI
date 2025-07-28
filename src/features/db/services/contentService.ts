@@ -1,12 +1,5 @@
-import dbConnect from '../dbConnect';
-import {
-  getAllExams,
-  getSubjectsByExam,
-  getTopicsBySubject,
-  getSubtopicsByTopic,
-  getConceptsBySubtopic,
-  getExamByCode
-} from '../data';
+// Client-safe content service that only makes API calls
+// No direct database model imports
 
 export interface ExamData {
   _id: string;
@@ -73,16 +66,12 @@ export interface ContentLibrary {
 
 // Get all exams for the exam selection page
 export const getExamsForSelection = async (): Promise<ExamData[]> => {
-  await dbConnect();
-  const exams = await getAllExams();
-  return exams.map(exam => ({
-    _id: exam._id.toString(),
-    name: exam.name,
-    code: exam.code,
-    description: exam.description,
-    icon: exam.icon,
-    gradient: exam.gradient
-  }));
+  const response = await fetch('/api/exams');
+  if (!response.ok) {
+    throw new Error('Failed to fetch exams');
+  }
+  const data = await response.json();
+  return data.exams;
 };
 
 // Get exam categories (for backward compatibility)
@@ -93,148 +82,70 @@ export const getExamCategories = async (): Promise<string[]> => {
 
 // Get subjects for a specific exam
 export const getSubjectsForExam = async (examCode: string): Promise<SubjectData[]> => {
-  await dbConnect();
-  const exam = await getExamByCode(examCode);
-  if (!exam) {
-    throw new Error(`Exam with code ${examCode} not found`);
+  const response = await fetch(`/api/subjects?exam=${encodeURIComponent(examCode)}`);
+  if (!response.ok) {
+    throw new Error('Failed to fetch subjects');
   }
-  
-  const subjects = await getSubjectsByExam(exam._id.toString());
-  return subjects.map(subject => ({
-    _id: subject._id.toString(),
-    name: subject.name,
-    code: subject.code,
-    description: subject.description,
-    exam: subject.exam.toString()
-  }));
+  const data = await response.json();
+  return data.subjects;
 };
 
 // Get topics for a specific subject
 export const getTopicsForSubject = async (subjectId: string): Promise<TopicData[]> => {
-  await dbConnect();
-  const topics = await getTopicsBySubject(subjectId);
-  return topics.map(topic => ({
-    _id: topic._id.toString(),
-    name: topic.name,
-    code: topic.code,
-    description: topic.description,
-    subject: topic.subject.toString()
-  }));
+  const response = await fetch(`/api/topics?subject=${encodeURIComponent(subjectId)}`);
+  if (!response.ok) {
+    throw new Error('Failed to fetch topics');
+  }
+  const data = await response.json();
+  return data.topics;
 };
 
 // Get subtopics for a specific topic
 export const getSubtopicsForTopic = async (topicId: string): Promise<SubtopicData[]> => {
-  await dbConnect();
-  const subtopics = await getSubtopicsByTopic(topicId);
-  return subtopics.map(subtopic => ({
-    _id: subtopic._id.toString(),
-    name: subtopic.name,
-    code: subtopic.code,
-    description: subtopic.description,
-    topic: subtopic.topic.toString(),
-    parentSubtopic: subtopic.parentSubtopic?.toString()
-  }));
+  const response = await fetch(`/api/subtopics?topic=${encodeURIComponent(topicId)}`);
+  if (!response.ok) {
+    throw new Error('Failed to fetch subtopics');
+  }
+  const data = await response.json();
+  return data.subtopics;
 };
 
 // Get concepts for a specific subtopic
 export const getConceptsForSubtopic = async (subtopicId: string): Promise<ConceptData[]> => {
-  await dbConnect();
-  const concepts = await getConceptsBySubtopic(subtopicId);
-  return concepts.map(concept => ({
-    _id: concept._id.toString(),
-    name: concept.name,
-    code: concept.code,
-    description: concept.description,
-    subtopic: concept.subtopic.toString(),
-    keyPoints: concept.keyPoints,
-    concepts: concept.concepts,
-    difficulty: concept.difficulty,
-    estimatedTime: concept.estimatedTime
-  }));
+  const response = await fetch(`/api/concepts?subtopic=${encodeURIComponent(subtopicId)}`);
+  if (!response.ok) {
+    throw new Error('Failed to fetch concepts');
+  }
+  const data = await response.json();
+  return data.concepts;
 };
 
 // Get topic content (for backward compatibility with existing code)
 export const getTopicContent = async (examCode: string, subjectName: string, topicName: string): Promise<TopicContent | null> => {
-  await dbConnect();
-  
-  // Get exam
-  const exam = await getExamByCode(examCode);
-  if (!exam) return null;
-  
-  // Get subject
-  const subjects = await getSubjectsByExam(exam._id.toString());
-  const subject = subjects.find(s => s.name === subjectName);
-  if (!subject) return null;
-  
-  // Get topic
-  const topics = await getTopicsBySubject(subject._id.toString());
-  const topic = topics.find(t => t.name === topicName);
-  if (!topic) return null;
-  
-  // Get subtopics
-  const subtopics = await getSubtopicsByTopic(topic._id.toString());
-  if (subtopics.length === 0) return null;
-  
-  // Get concepts from first subtopic (for now, we'll use the first subtopic)
-  const concepts = await getConceptsBySubtopic(subtopics[0]._id.toString());
-  if (concepts.length === 0) return null;
-  
-  // Combine all key points from all concepts
-  const allKeyPoints = concepts.flatMap(concept => concept.keyPoints);
-  const allConcepts = concepts.map(concept => concept.concepts).join(' ');
-  
-  return {
-    keyPoints: allKeyPoints,
-    concepts: allConcepts
-  };
+  const response = await fetch(`/api/topic-content?exam=${encodeURIComponent(examCode)}&subject=${encodeURIComponent(subjectName)}&topic=${encodeURIComponent(topicName)}`);
+  if (!response.ok) {
+    return null;
+  }
+  const data = await response.json();
+  return data.content;
 };
 
 // Get full content library (for backward compatibility)
 export const getContentLibrary = async (): Promise<ContentLibrary> => {
-  await dbConnect();
-  
-  const contentLibrary: ContentLibrary = {};
-  const exams = await getAllExams();
-  
-  for (const exam of exams) {
-    contentLibrary[exam.code] = {};
-    
-    const subjects = await getSubjectsByExam(exam._id.toString());
-    for (const subject of subjects) {
-      contentLibrary[exam.code][subject.name] = {};
-      
-      const topics = await getTopicsBySubject(subject._id.toString());
-      for (const topic of topics) {
-        const subtopics = await getSubtopicsByTopic(topic._id.toString());
-        
-        for (const subtopic of subtopics) {
-          const concepts = await getConceptsBySubtopic(subtopic._id.toString());
-          
-          if (concepts.length > 0) {
-            const allKeyPoints = concepts.flatMap(concept => concept.keyPoints);
-            const allConcepts = concepts.map(concept => concept.concepts).join(' ');
-            
-            contentLibrary[exam.code][subject.name][topic.name] = {
-              keyPoints: allKeyPoints,
-              concepts: allConcepts
-            };
-          }
-        }
-      }
-    }
+  const response = await fetch('/api/content-library');
+  if (!response.ok) {
+    throw new Error('Failed to fetch content library');
   }
-  
-  return contentLibrary;
+  const data = await response.json();
+  return data.contentLibrary;
 };
 
 // Get exam configuration for UI
 export const getExamConfig = async (examCode: string) => {
-  const exam = await getExamByCode(examCode);
-  if (!exam) return null;
-  
-  return {
-    icon: exam.icon,
-    gradient: exam.gradient,
-    description: exam.description
-  };
+  const response = await fetch(`/api/exam-config?exam=${encodeURIComponent(examCode)}`);
+  if (!response.ok) {
+    return null;
+  }
+  const data = await response.json();
+  return data.config;
 }; 

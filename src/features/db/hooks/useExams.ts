@@ -4,13 +4,13 @@ import {
   getExamCategories,
   ExamData 
 } from '../services/contentService';
-import { getExamByCode } from '../data';
+import { getExamByCode } from '../data/client';
 import { 
   getAllExams, 
   createExam, 
   updateExam, 
   deleteExam
-} from '../data';
+} from '../data/client';
 
 // Query Keys
 export const examKeys = {

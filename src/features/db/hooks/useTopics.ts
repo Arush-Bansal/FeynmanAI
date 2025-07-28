@@ -8,7 +8,7 @@ import {
   createTopic, 
   updateTopic, 
   deleteTopic 
-} from '../data';
+} from '../data/client';
 
 // Query Keys
 export const topicKeys = {

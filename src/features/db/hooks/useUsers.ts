@@ -7,7 +7,7 @@ import {
   updateUserStats, 
   updateUserPreferences, 
   incrementUserStats 
-} from '../data';
+} from '../data/client';
 
 // Query Keys
 export const userKeys = {

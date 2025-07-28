@@ -1,4 +1,4 @@
-import { PracticeSession, IPracticeSession } from "@/features/db";
+import { PracticeSession, IPracticeSession } from "@/features/db/models/PracticeSession";
 
 export const createPracticeSession = async (sessionData: Partial<IPracticeSession>) => {
   return await PracticeSession.create(sessionData);

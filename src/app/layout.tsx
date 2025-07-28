@@ -5,7 +5,7 @@ import { Navigation } from "@/components/Navigation";
 import { RouteProtection } from "@/features/auth/components/RouteProtection";
 import { SessionWrapper } from "@/features/auth/lib/SessionWrapper";
 import { ReactQueryProvider } from "@/components/ReactQueryProvider";
-import { DatabaseInitializer } from "@/features/db/components/DatabaseInitializer";
+
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -40,7 +40,6 @@ export default function RootLayout({
           >
             <div className="absolute inset-0 bg-gradient-to-br from-black via-black to-black opacity-90"></div>
             <SessionWrapper>
-              <DatabaseInitializer />
               <div className="relative z-10">
                 <Navigation />
                 <RouteProtection>{children}</RouteProtection>

@@ -8,7 +8,7 @@ import {
   createSubject, 
   updateSubject, 
   deleteSubject 
-} from '../data';
+} from '../data/client';
 
 // Query Keys
 export const subjectKeys = {
