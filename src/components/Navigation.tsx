@@ -1,6 +1,7 @@
 "use client"
 import { Brain } from "lucide-react";
 import Link from 'next/link';
+import Image from 'next/image';
 import { useSession } from "next-auth/react"
 import { Button } from "@/components/ui/button"
 
@@ -32,11 +33,13 @@ export function Navigation() {
                   <Button variant="ghost">History</Button>
                 </Link>
                 <Link href="/profile">
-                  <img
+                  <Image
                     src={session.user?.image || "/default-avatar.svg"}
                     alt="Profile"
+                    width={32}
+                    height={32}
                     className="w-8 h-8 rounded-full cursor-pointer"
-                    onError={(e) => { e.currentTarget.src = "/default-avatar.svg"; }}
+                    onError={(e) => { (e.target as HTMLImageElement).src = "/default-avatar.svg"; }}
                   />
                 </Link>
               </div>

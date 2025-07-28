@@ -6,7 +6,7 @@ const nextConfig: NextConfig = {
     optimizeCss: true,
   },
   images: {
-    domains: [],
+    domains: ["lh3.googleusercontent.com"],
   },
 };
 
