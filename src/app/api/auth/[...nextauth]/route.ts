@@ -4,7 +4,7 @@ import { AuthOptions } from "next-auth";
 import { User } from "@/features/db/models";
 import dbConnect from "@/features/db/dbConnect";
 
-const authOptions : AuthOptions = {
+export const authOptions : AuthOptions = {
     providers: [
       GoogleProvider({
         clientId: process.env.GOOGLE_CLIENT_ID!,

@@ -1,25 +1,21 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';  
 import { NextResponse } from 'next/server';  
 import { config } from 'dotenv';
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route"
 import { analyzeFeynmanExplanationTool, generateFeynmanPrompt } from '@/features/gemini';
-import { dbConnect, createFeynmanAnalysis } from '@/features/db';
+import { getServerSession } from 'next-auth';
 
-// Load environment variables
 config();
 
 export async function POST(request: Request) {  
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let session: any = null;
+  const session = await getServerSession(authOptions);
+
+  if (!session?.user) {
+    return NextResponse.json({ error: "Authentication required" }, { status: 401 });
+  }
+;
   
   try {
-    // Check authentication
-    session = await getServerSession(authOptions);
-    
-    if (!session?.user) {
-      return NextResponse.json({ error: "Authentication required" }, { status: 401 });
-    }
     const requestBody = await request.json();
     const { topic, exam, subject, keyPoints, transcript } = requestBody;
     
@@ -62,19 +58,19 @@ export async function POST(request: Request) {
     const responseText = response.text();
     if (response.candidates?.[0]?.content?.parts?.[0]?.functionCall) {
       const functionCall = response.candidates[0].content.parts[0].functionCall;
-      const analysis = functionCall.args;
+      // const analysis = functionCall.args;
 
-      await dbConnect();
-      await createFeynmanAnalysis({
-        user: session.user.id,
-        topic,
-        exam,
-        subject,
-        keyPoints,
-        transcript,
-        analysis,
-      });
-
+      // await dbConnect();
+      // await createFeynmanAnalysis({
+      //   user: session.user.id,
+        // topic,
+        // exam,
+        // subject,
+        // keyPoints,
+        // transcript,
+        // analysis,
+      // });
+// 
       const responseToFrontend = {
         functionCall: functionCall,
         error: undefined
