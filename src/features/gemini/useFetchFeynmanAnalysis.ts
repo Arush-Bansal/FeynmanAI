@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { backendApi } from '@/lib/axios';
+import { backendApi } from '@/lib/api';
 
 interface FeynmanAnalysisProps {
   topic: string;

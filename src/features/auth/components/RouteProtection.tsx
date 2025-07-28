@@ -3,7 +3,7 @@
 import { usePathname, useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { useEffect } from 'react';
-import { getRouteConfig } from './routeConfig';
+import { getRouteConfig } from '../lib/routeConfig';
 import { getSelectedExam } from '@/lib/utils';
 
 interface RouteProtectionProps {
