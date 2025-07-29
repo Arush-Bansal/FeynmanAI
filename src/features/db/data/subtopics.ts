@@ -54,7 +54,12 @@ export const getSubtopicTree = async (topicId: string) => {
   // Build tree structure
   const buildTree = (items: ISubtopic[], parentId: string | null = null): ISubtopic[] => {
     return items
-      .filter(item => item.parentSubtopic?.toString() === parentId)
+      .filter(item => {
+        if (parentId === null) {
+          return !item.parentSubtopic || item.parentSubtopic === null;
+        }
+        return item.parentSubtopic?.toString() === parentId;
+      })
       .map((item: ISubtopic) => ({
         ...item.toObject(),
         children: buildTree(items, item._id.toString())

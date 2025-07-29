@@ -19,6 +19,10 @@ export const analyzeFeynmanExplanationTool = {
           type: "string",
           description: "The main topic the student is explaining."
         },
+        subtopic: {
+          type: "string",
+          description: "The specific subtopic the student is explaining (optional)."
+        },
         keyPoints: {
           type: "array",
           items: {

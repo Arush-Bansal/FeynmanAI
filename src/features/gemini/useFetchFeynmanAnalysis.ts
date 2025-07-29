@@ -5,6 +5,7 @@ interface FeynmanAnalysisProps {
   topic: string;
   exam: string;
   subject: string;
+  subtopic?: string;
   keyPoints: string[];
   transcript: string;
   enabled?: boolean;
@@ -41,14 +42,14 @@ const fetchFeynmanAnalysis = async (params: FeynmanAnalysisProps): Promise<Feynm
   return res.data;
 };
 
-export const useFetchFeynmanAnalysis = ({ topic, exam, subject, keyPoints, transcript, enabled = true }: FeynmanAnalysisProps) => {
+export const useFetchFeynmanAnalysis = ({ topic, exam, subject, subtopic, keyPoints, transcript, enabled = true }: FeynmanAnalysisProps) => {
   const {
     data: geminiResponse,
     isLoading: isGeminiLoading,
     error: geminiError,
   } = useQuery<FeynmanApiResponse>({
-    queryKey: ['feynman-analysis', topic, exam, subject, keyPoints, transcript],
-    queryFn: () => fetchFeynmanAnalysis({ topic, exam, subject, keyPoints, transcript }),
+    queryKey: ['feynman-analysis', topic, exam, subject, subtopic, keyPoints, transcript],
+    queryFn: () => fetchFeynmanAnalysis({ topic, exam, subject, subtopic, keyPoints, transcript }),
     enabled: enabled && !!topic && !!exam && !!subject && !!transcript,
     staleTime: Infinity,
     gcTime: Infinity,

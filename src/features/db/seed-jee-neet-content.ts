@@ -7,6 +7,7 @@ import { createSubtopic } from './data/subtopics';
 import { Exam, IExam } from './models/Exam';
 import { ISubject } from './models/Subject';
 import { ITopic } from './models/Topic';
+import { ISubtopic } from './models/Subtopic';
 
 // Exam data for JEE and NEET
 const examData = [
@@ -114,7 +115,7 @@ const neetTopics = {
   ],
 };
 
-// Subtopic data for JEE topics
+// Subtopic data for JEE topics with nested structure
 const jeeSubtopics = {
   MECHANICS: [
     { name: 'Kinematics', code: 'KINEMATICS', description: 'Study of motion without considering forces' },
@@ -122,6 +123,64 @@ const jeeSubtopics = {
     { name: 'Work and Energy', code: 'WORK_ENERGY', description: 'Study of work, energy, and power' },
     { name: 'Momentum', code: 'MOMENTUM', description: 'Study of linear and angular momentum' },
     { name: 'Gravitation', code: 'GRAVITATION', description: 'Study of gravitational forces' },
+  ],
+  // Nested subtopics under Kinematics
+  KINEMATICS: [
+    { name: 'Linear Motion', code: 'LINEAR_MOTION', description: 'Motion in a straight line' },
+    { name: 'Circular Motion', code: 'CIRCULAR_MOTION', description: 'Motion along a circular path' },
+    { name: 'Projectile Motion', code: 'PROJECTILE_MOTION', description: 'Motion under gravity' },
+    { name: 'Relative Motion', code: 'RELATIVE_MOTION', description: 'Motion from different reference frames' },
+    { name: 'Kinematic Equations', code: 'KINEMATIC_EQUATIONS', description: 'Mathematical equations of motion' },
+  ],
+  // Nested subtopics under Linear Motion
+  LINEAR_MOTION: [
+    { name: 'Uniform Motion', code: 'UNIFORM_MOTION', description: 'Constant velocity motion' },
+    { name: 'Accelerated Motion', code: 'ACCELERATED_MOTION', description: 'Motion with changing velocity' },
+    { name: 'Free Fall', code: 'FREE_FALL', description: 'Motion under gravity only' },
+  ],
+  // Nested subtopics under Circular Motion
+  CIRCULAR_MOTION: [
+    { name: 'Uniform Circular Motion', code: 'UNIFORM_CIRCULAR_MOTION', description: 'Constant speed circular motion' },
+    { name: 'Non-Uniform Circular Motion', code: 'NON_UNIFORM_CIRCULAR_MOTION', description: 'Variable speed circular motion' },
+    { name: 'Banking of Roads', code: 'BANKING_OF_ROADS', description: 'Curved road banking' },
+  ],
+  // Nested subtopics under Dynamics
+  DYNAMICS: [
+    { name: 'Newton\'s Laws', code: 'NEWTONS_LAWS', description: 'Fundamental laws of motion' },
+    { name: 'Friction', code: 'FRICTION', description: 'Resistance to motion' },
+    { name: 'Centripetal Force', code: 'CENTRIPETAL_FORCE', description: 'Force for circular motion' },
+    { name: 'Tension', code: 'TENSION', description: 'Force in strings and ropes' },
+    { name: 'Normal Force', code: 'NORMAL_FORCE', description: 'Contact force perpendicular to surface' },
+  ],
+  // Nested subtopics under Newton's Laws
+  NEWTONS_LAWS: [
+    { name: 'First Law (Inertia)', code: 'NEWTONS_FIRST_LAW', description: 'Law of inertia' },
+    { name: 'Second Law (F = ma)', code: 'NEWTONS_SECOND_LAW', description: 'Force equals mass times acceleration' },
+    { name: 'Third Law (Action-Reaction)', code: 'NEWTONS_THIRD_LAW', description: 'Equal and opposite forces' },
+  ],
+  // Nested subtopics under Work and Energy
+  WORK_ENERGY: [
+    { name: 'Work Done', code: 'WORK_DONE', description: 'Energy transferred by force' },
+    { name: 'Kinetic Energy', code: 'KINETIC_ENERGY', description: 'Energy of motion' },
+    { name: 'Potential Energy', code: 'POTENTIAL_ENERGY', description: 'Stored energy' },
+    { name: 'Conservation of Energy', code: 'ENERGY_CONSERVATION', description: 'Total energy remains constant' },
+    { name: 'Power', code: 'POWER', description: 'Rate of doing work' },
+  ],
+  // Nested subtopics under Momentum
+  MOMENTUM: [
+    { name: 'Linear Momentum', code: 'LINEAR_MOMENTUM', description: 'Product of mass and velocity' },
+    { name: 'Conservation of Momentum', code: 'MOMENTUM_CONSERVATION', description: 'Momentum remains constant' },
+    { name: 'Impulse', code: 'IMPULSE', description: 'Change in momentum' },
+    { name: 'Collisions', code: 'COLLISIONS', description: 'Interaction between objects' },
+    { name: 'Angular Momentum', code: 'ANGULAR_MOMENTUM', description: 'Rotational momentum' },
+  ],
+  // Nested subtopics under Gravitation
+  GRAVITATION: [
+    { name: 'Universal Law of Gravitation', code: 'UNIVERSAL_GRAVITATION', description: 'Newton\'s law of gravity' },
+    { name: 'Gravitational Field', code: 'GRAVITATIONAL_FIELD', description: 'Space around massive objects' },
+    { name: 'Gravitational Potential', code: 'GRAVITATIONAL_POTENTIAL', description: 'Potential energy in gravity' },
+    { name: 'Satellite Motion', code: 'SATELLITE_MOTION', description: 'Orbital motion' },
+    { name: 'Escape Velocity', code: 'ESCAPE_VELOCITY', description: 'Speed to escape gravity' },
   ],
   THERMODYNAMICS: [
     { name: 'Laws of Thermodynamics', code: 'THERMODYNAMICS_LAWS', description: 'Fundamental laws of thermodynamics' },
@@ -167,7 +226,7 @@ const jeeSubtopics = {
   ],
 };
 
-// Subtopic data for NEET topics
+// Subtopic data for NEET topics with nested structure
 const neetSubtopics = {
   MECHANICS: [
     { name: 'Kinematics', code: 'KINEMATICS', description: 'Study of motion without considering forces' },
@@ -175,6 +234,40 @@ const neetSubtopics = {
     { name: 'Work and Energy', code: 'WORK_ENERGY', description: 'Study of work, energy, and power' },
     { name: 'Momentum', code: 'MOMENTUM', description: 'Study of linear and angular momentum' },
     { name: 'Gravitation', code: 'GRAVITATION', description: 'Study of gravitational forces' },
+  ],
+  // Nested subtopics under Kinematics (same as JEE)
+  KINEMATICS: [
+    { name: 'Linear Motion', code: 'LINEAR_MOTION', description: 'Motion in a straight line' },
+    { name: 'Circular Motion', code: 'CIRCULAR_MOTION', description: 'Motion along a circular path' },
+    { name: 'Projectile Motion', code: 'PROJECTILE_MOTION', description: 'Motion under gravity' },
+    { name: 'Relative Motion', code: 'RELATIVE_MOTION', description: 'Motion from different reference frames' },
+    { name: 'Kinematic Equations', code: 'KINEMATIC_EQUATIONS', description: 'Mathematical equations of motion' },
+  ],
+  // Nested subtopics under Linear Motion
+  LINEAR_MOTION: [
+    { name: 'Uniform Motion', code: 'UNIFORM_MOTION', description: 'Constant velocity motion' },
+    { name: 'Accelerated Motion', code: 'ACCELERATED_MOTION', description: 'Motion with changing velocity' },
+    { name: 'Free Fall', code: 'FREE_FALL', description: 'Motion under gravity only' },
+  ],
+  // Nested subtopics under Circular Motion
+  CIRCULAR_MOTION: [
+    { name: 'Uniform Circular Motion', code: 'UNIFORM_CIRCULAR_MOTION', description: 'Constant speed circular motion' },
+    { name: 'Non-Uniform Circular Motion', code: 'NON_UNIFORM_CIRCULAR_MOTION', description: 'Variable speed circular motion' },
+    { name: 'Banking of Roads', code: 'BANKING_OF_ROADS', description: 'Curved road banking' },
+  ],
+  // Nested subtopics under Dynamics
+  DYNAMICS: [
+    { name: 'Newton\'s Laws', code: 'NEWTONS_LAWS', description: 'Fundamental laws of motion' },
+    { name: 'Friction', code: 'FRICTION', description: 'Resistance to motion' },
+    { name: 'Centripetal Force', code: 'CENTRIPETAL_FORCE', description: 'Force for circular motion' },
+    { name: 'Tension', code: 'TENSION', description: 'Force in strings and ropes' },
+    { name: 'Normal Force', code: 'NORMAL_FORCE', description: 'Contact force perpendicular to surface' },
+  ],
+  // Nested subtopics under Newton's Laws
+  NEWTONS_LAWS: [
+    { name: 'First Law (Inertia)', code: 'NEWTONS_FIRST_LAW', description: 'Law of inertia' },
+    { name: 'Second Law (F = ma)', code: 'NEWTONS_SECOND_LAW', description: 'Force equals mass times acceleration' },
+    { name: 'Third Law (Action-Reaction)', code: 'NEWTONS_THIRD_LAW', description: 'Equal and opposite forces' },
   ],
   THERMODYNAMICS: [
     { name: 'Laws of Thermodynamics', code: 'THERMODYNAMICS_LAWS', description: 'Fundamental laws of thermodynamics' },
@@ -345,46 +438,108 @@ export async function seedJeeNeetContent() {
       }
     }
 
-    // Create subtopics for JEE
+    // Create subtopics for JEE with nested structure
+    const createdSubtopics: { [key: string]: ISubtopic } = {};
+    
+    // First pass: Create all first-level subtopics (children of topics)
     for (const [topicCode, subtopics] of Object.entries(jeeSubtopics)) {
       const topic = jeeTopicsCreated[topicCode];
       if (topic) {
         for (const subtopic of subtopics) {
           try {
-            await createSubtopic({
+            const createdSubtopic = await createSubtopic({
               ...subtopic,
               topic: topic._id,
             });
-            console.log(`✅ Created JEE subtopic: ${subtopic.name}`);
+            createdSubtopics[subtopic.code] = createdSubtopic;
+            console.log(`✅ Created JEE first-level subtopic: ${subtopic.name}`);
           } catch (error: unknown) {
             const err = error as { code?: number };
             if (err.code === 11000) {
-              console.log(`⏭️  JEE subtopic ${subtopic.name} already exists, skipping...`);
+              console.log(`⏭️  JEE first-level subtopic ${subtopic.name} already exists, skipping...`);
             } else {
-              console.error(`❌ Error creating JEE subtopic ${subtopic.name}:`, error);
+              console.error(`❌ Error creating JEE first-level subtopic ${subtopic.name}:`, error);
+            }
+          }
+        }
+      }
+    }
+    
+    // Second pass: Create nested subtopics (children of subtopics)
+    for (const [parentCode, subtopics] of Object.entries(jeeSubtopics)) {
+      // Skip topics (only process subtopics that have children)
+      if (!jeeTopicsCreated[parentCode]) {
+        const parentSubtopic = createdSubtopics[parentCode];
+        if (parentSubtopic) {
+          for (const subtopic of subtopics) {
+            try {
+              await createSubtopic({
+                ...subtopic,
+                topic: parentSubtopic.topic, // Same topic as parent
+                parentSubtopic: parentSubtopic._id,
+              });
+              console.log(`✅ Created JEE nested subtopic: ${subtopic.name} under ${parentCode}`);
+            } catch (error: unknown) {
+              const err = error as { code?: number };
+              if (err.code === 11000) {
+                console.log(`⏭️  JEE nested subtopic ${subtopic.name} already exists, skipping...`);
+              } else {
+                console.error(`❌ Error creating JEE nested subtopic ${subtopic.name}:`, error);
+              }
             }
           }
         }
       }
     }
 
-    // Create subtopics for NEET
+    // Create subtopics for NEET with nested structure
+    const createdNeetSubtopics: { [key: string]: ISubtopic } = {};
+    
+    // First pass: Create all first-level subtopics (children of topics)
     for (const [topicCode, subtopics] of Object.entries(neetSubtopics)) {
       const topic = neetTopicsCreated[topicCode];
       if (topic) {
         for (const subtopic of subtopics) {
           try {
-            await createSubtopic({
+            const createdSubtopic = await createSubtopic({
               ...subtopic,
               topic: topic._id,
             });
-            console.log(`✅ Created NEET subtopic: ${subtopic.name}`);
+            createdNeetSubtopics[subtopic.code] = createdSubtopic;
+            console.log(`✅ Created NEET first-level subtopic: ${subtopic.name}`);
           } catch (error: unknown) {
             const err = error as { code?: number };
             if (err.code === 11000) {
-              console.log(`⏭️  NEET subtopic ${subtopic.name} already exists, skipping...`);
+              console.log(`⏭️  NEET first-level subtopic ${subtopic.name} already exists, skipping...`);
             } else {
-              console.error(`❌ Error creating NEET subtopic ${subtopic.name}:`, error);
+              console.error(`❌ Error creating NEET first-level subtopic ${subtopic.name}:`, error);
+            }
+          }
+        }
+      }
+    }
+    
+    // Second pass: Create nested subtopics (children of subtopics)
+    for (const [parentCode, subtopics] of Object.entries(neetSubtopics)) {
+      // Skip topics (only process subtopics that have children)
+      if (!neetTopicsCreated[parentCode]) {
+        const parentSubtopic = createdNeetSubtopics[parentCode];
+        if (parentSubtopic) {
+          for (const subtopic of subtopics) {
+            try {
+              await createSubtopic({
+                ...subtopic,
+                topic: parentSubtopic.topic, // Same topic as parent
+                parentSubtopic: parentSubtopic._id,
+              });
+              console.log(`✅ Created NEET nested subtopic: ${subtopic.name} under ${parentCode}`);
+            } catch (error: unknown) {
+              const err = error as { code?: number };
+              if (err.code === 11000) {
+                console.log(`⏭️  NEET nested subtopic ${subtopic.name} already exists, skipping...`);
+              } else {
+                console.error(`❌ Error creating NEET nested subtopic ${subtopic.name}:`, error);
+              }
             }
           }
         }

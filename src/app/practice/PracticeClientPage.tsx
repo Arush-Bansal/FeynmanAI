@@ -15,6 +15,7 @@ const PracticeClientPage = () => {
   const topic = searchParams.get('topic');
   const exam = searchParams.get('exam');
   const subject = searchParams.get('subject');
+  const subtopic = searchParams.get('subtopic'); // Get subtopic from search params
   const keyPoints = searchParams.get('keyPoints'); // Get keyPoints from search params
 
   const { transcript, listening, startListening, stopListening } = useSpeechToText();
@@ -31,8 +32,11 @@ const PracticeClientPage = () => {
       toast.error("Please record your explanation before submitting.");
       return;
     }
-    // Pass keyPoints to the analysis page
-    router.push(`/analysis?exam=${exam}&subject=${subject}&topic=${topic}&transcript=${encodeURIComponent(transcript)}${keyPoints ? `&keyPoints=${keyPoints}` : ''}`);
+    // Pass keyPoints and subtopic to the analysis page
+    const analysisParams = `exam=${exam}&subject=${subject}&topic=${topic}&transcript=${encodeURIComponent(transcript)}`;
+    const keyPointsParam = keyPoints ? `&keyPoints=${keyPoints}` : '';
+    const subtopicParam = subtopic ? `&subtopic=${encodeURIComponent(subtopic)}` : '';
+    router.push(`/analysis?${analysisParams}${keyPointsParam}${subtopicParam}`);
   };
 
   if (!topic || !exam || !subject) {
@@ -45,7 +49,14 @@ const PracticeClientPage = () => {
         <Card className="bg-gray-900/50 border-gray-700 backdrop-blur-sm shadow-2xl">
           <CardContent className="p-8">
             <div className="text-center mb-8">
-              <h2 className="text-3xl font-bold text-white mb-2">Explain: {topic}</h2>
+              <h2 className="text-3xl font-bold text-white mb-2">
+                Explain: {subtopic ? `${topic} - ${subtopic}` : topic}
+              </h2>
+              {subtopic && (
+                <p className="text-gray-400 text-sm mb-2">
+                  Studying specific subtopic within {topic}
+                </p>
+              )}
               <p className="text-gray-300 text-lg">Hold the mic button or spacebar to record your explanation</p>
             </div>
 

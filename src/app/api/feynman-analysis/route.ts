@@ -17,7 +17,7 @@ export async function POST(request: Request) {
   
   try {
     const requestBody = await request.json();
-    const { topic, exam, subject, keyPoints, transcript } = requestBody;
+    const { topic, exam, subject, subtopic, keyPoints, transcript } = requestBody;
     
     // Validate required fields
     console.log('Validating required fields...');
@@ -49,7 +49,7 @@ export async function POST(request: Request) {
       }
     };
     const model = genAI.getGenerativeModel(modelConfig);  
-    const prompt = generateFeynmanPrompt(topic, exam, subject, keyPoints, transcript);
+    const prompt = generateFeynmanPrompt(topic, exam, subject, subtopic, keyPoints, transcript);
     
     const result = await model.generateContent([prompt]);  
     const response = result.response;

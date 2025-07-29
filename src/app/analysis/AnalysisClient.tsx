@@ -16,6 +16,7 @@ const AnalysisClient = () => {
   const topic = searchParams.get('topic');
   const exam = searchParams.get('exam');
   const subject = searchParams.get('subject');
+  const subtopic = searchParams.get('subtopic');
   const transcript = searchParams.get('transcript');
   const keyPointsParam = searchParams.get('keyPoints');
   const keyPoints = keyPointsParam ? keyPointsParam.split(',') : [];
@@ -24,6 +25,7 @@ const AnalysisClient = () => {
     topic: topic || '',
     exam: exam || '',
     subject: subject || '',
+    subtopic: subtopic || '',
     keyPoints: keyPoints,
     transcript: transcript || ''
   });
@@ -36,7 +38,9 @@ const AnalysisClient = () => {
   }, [topic, exam, subject, transcript, router]);
 
   const handleTryAgain = () => {
-    router.push(`/practice?exam=${exam}&subject=${subject}&topic=${topic}`);
+    const practiceParams = `exam=${exam}&subject=${subject}&topic=${topic}`;
+    const subtopicParam = subtopic ? `&subtopic=${encodeURIComponent(subtopic)}` : '';
+    router.push(`/practice?${practiceParams}${subtopicParam}`);
   };
 
   if (!topic || !exam || !subject || !transcript) {
@@ -51,7 +55,9 @@ const AnalysisClient = () => {
         <main className="lg:col-span-3 bg-gray-800/50 sm:rounded-lg p-4 sm:p-8 shadow-lg sm:border border-gray-700">
           <header className="border-b border-gray-600 pb-4 mb-6">
             <p className="text-sm text-gray-400">{exam} &gt; {subject}</p>
-            <h1 className="text-4xl font-bold text-white mt-2">Analysis Report: {topic}</h1>
+            <h1 className="text-4xl font-bold text-white mt-2">
+              Analysis Report: {subtopic ? `${topic} - ${subtopic}` : topic}
+            </h1>
           </header>
 
           <section id="your-explanation" className="mb-8 scroll-mt-20">

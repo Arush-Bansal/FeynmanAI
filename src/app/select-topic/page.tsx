@@ -76,10 +76,8 @@ const SelectTopicPage = () => {
       return;
     }
 
-    // Use topic content for key points if available
-    const keyPoints = topicContent?.content?.keyPoints || [selectedTopic.name];
-
-    router.push(`/practice?exam=${selectedExamCategory}&subject=${selectedSubject}&topic=${selectedTopic.name}${keyPoints ? `&keyPoints=${keyPoints.join(',')}` : ''}`);
+    // Navigate to subtopic tree page
+    router.push(`/subtopic-tree?exam=${selectedExamCategory}&subject=${selectedSubject}&topic=${selectedTopic._id}`);
   };
 
   const handleTopicSelect = (topicId: string) => {
@@ -223,7 +221,7 @@ const SelectTopicPage = () => {
             onClick={handleTopicSubmit}
             className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 text-lg font-semibold rounded-lg transition-all duration-200 transform hover:scale-105"
           >
-            Start Practice Session
+            View Subtopic Tree
           </Button>
         </div>
       )}

@@ -10,6 +10,9 @@
     "seed:neet-pg-upsc": "tsx src/features/db/seed-neet-pg-upsc.ts",
     "seed:exams": "tsx src/features/db/seed-exams.ts",
     "seed:jee-neet-content": "tsx src/features/db/seed-jee-neet-content.ts",
+    "seed:nested-subtopics": "tsx src/features/db/seed-jee-neet-content.ts",
+    "seed:deep-nested-subtopics": "tsx src/features/db/seed-deep-nested-subtopics.ts",
+    "seed:third-level-subtopics": "tsx src/features/db/seed-third-level-subtopics.ts",
     "seed:all": "tsx src/features/db/seed-all.ts"
   },
   "dependencies": {
