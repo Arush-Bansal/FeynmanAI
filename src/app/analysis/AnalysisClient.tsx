@@ -16,16 +16,22 @@ const AnalysisClient = () => {
   const topic = searchParams.get('topic');
   const exam = searchParams.get('exam');
   const subject = searchParams.get('subject');
+  const subtopic = searchParams.get('subtopic');
   const transcript = searchParams.get('transcript');
   const keyPointsParam = searchParams.get('keyPoints');
   const keyPoints = keyPointsParam ? keyPointsParam.split(',') : [];
+  const sessionId = searchParams.get('sessionId');
+  const duration = searchParams.get('duration');
 
   const { analysisContent, isGeminiLoading } = useFetchFeynmanAnalysis({
     topic: topic || '',
     exam: exam || '',
     subject: subject || '',
+    subtopic: subtopic || '',
     keyPoints: keyPoints,
-    transcript: transcript || ''
+    transcript: transcript || '',
+    sessionId: sessionId || '',
+    duration: duration ? parseInt(duration) : 0
   });
 
   useEffect(() => {
@@ -36,7 +42,9 @@ const AnalysisClient = () => {
   }, [topic, exam, subject, transcript, router]);
 
   const handleTryAgain = () => {
-    router.push(`/practice?exam=${exam}&subject=${subject}&topic=${topic}`);
+    const practiceParams = `exam=${exam}&subject=${subject}&topic=${topic}`;
+    const subtopicParam = subtopic ? `&subtopic=${encodeURIComponent(subtopic)}` : '';
+    router.push(`/practice?${practiceParams}${subtopicParam}`);
   };
 
   if (!topic || !exam || !subject || !transcript) {
@@ -44,119 +52,146 @@ const AnalysisClient = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white p-0 sm:p-8">
-      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-4 gap-8">
+    <div className="relative z-10">
+      <div className="container mx-auto px-4 py-8 max-w-6xl pt-8">
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-bold text-white mb-4">
+            Your Feynman Analysis
+          </h1>
+          <p className="text-gray-300 text-lg">
+            Here&apos;s how well you explained {subtopic ? `${topic} - ${subtopic}` : topic}
+          </p>
+        </div>
 
-        {/* Main Content */}
-        <main className="lg:col-span-3 bg-gray-800/50 sm:rounded-lg p-4 sm:p-8 shadow-lg sm:border border-gray-700">
-          <header className="border-b border-gray-600 pb-4 mb-6">
-            <p className="text-sm text-gray-400">{exam} &gt; {subject}</p>
-            <h1 className="text-4xl font-bold text-white mt-2">Analysis Report: {topic}</h1>
-          </header>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Left Column - Analysis Results */}
+          <div className="lg:col-span-2 space-y-6">
+            <section id="gemini-feedback" className="mb-8 scroll-mt-20">
+              <h2 className="text-2xl font-semibold text-green-400 mb-4">Gemini&apos;s Feedback</h2>
+              <div className="prose prose-invert max-w-none text-gray-300">
+                {isGeminiLoading ? (
+                  <AnalysisSkeleton />
+                ) : analysisContent ? (
+                  <>
+                    <Card className="mb-6 bg-gray-700 border-gray-600">
+                      <CardHeader>
+                        <CardTitle className="text-xl text-white">Overall Score</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-4xl font-bold text-green-400">{analysisContent.overallScore}/100</p>
+                      </CardContent>
+                    </Card>
 
-          <section id="your-explanation" className="mb-8 scroll-mt-20">
-            <h2 className="text-2xl font-semibold text-green-400 mb-4">Your Explanation</h2>
-            <div className="bg-gray-900/70 rounded-md p-6 border border-gray-700">
-              <p className="text-gray-300 italic leading-relaxed">
-                {decodeURIComponent(transcript)}
-              </p>
-            </div>
-          </section>
+                    <h3 className="text-xl font-semibold text-white mb-3">Covered Topics</h3>
+                    <div className="flex flex-wrap gap-2 mb-6">
+                      {analysisContent.coveredTopics.map((item, index) => (
+                        <Badge key={index} variant={item.covered ? "default" : "secondary"}>
+                          {item.topicName} {item.covered ? '✅' : '❌'}
+                        </Badge>
+                      ))}
+                    </div>
 
-          <section id="gemini-feedback" className="mb-8 scroll-mt-20">
-            <h2 className="text-2xl font-semibold text-green-400 mb-4">Gemini&apos;s Feedback</h2>
-            <div className="prose prose-invert max-w-none text-gray-300">
-              {isGeminiLoading ? (
-                <AnalysisSkeleton />
-              ) : analysisContent ? (
-                <>
-                  <Card className="mb-6 bg-gray-700 border-gray-600">
-                    <CardHeader>
-                      <CardTitle className="text-xl text-white">Overall Score</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-4xl font-bold text-green-400">{analysisContent.overallScore}/100</p>
-                    </CardContent>
-                  </Card>
+                    <h3 className="text-xl font-semibold text-white mb-3">Detailed Analysis</h3>
+                    <div className="mb-6 text-gray-300 leading-relaxed">
+                      <ReactMarkdown>
+                        {analysisContent.detailedAnalysis}
+                      </ReactMarkdown>
+                    </div>
 
-                  <h3 className="text-xl font-semibold text-white mb-3">Covered Topics</h3>
-                  <div className="flex flex-wrap gap-2 mb-6">
-                    {analysisContent.coveredTopics.map((item, index) => (
-                      <Badge key={index} variant={item.covered ? "default" : "secondary"}>
-                        {item.topicName} {item.covered ? '✅' : '❌'}
-                      </Badge>
-                    ))}
+                    {analysisContent.sideQuestions && analysisContent.sideQuestions.length > 0 && (
+                      <>
+                        <h3 className="text-xl font-semibold text-white mb-3">Side Questions</h3>
+                        <div className="mb-6 space-y-3">
+                          {analysisContent.sideQuestions.map((item, index) => (
+                            <Card key={index} className="bg-gray-700 border-gray-600">
+                              <CardContent className="p-4">
+                                <p className="text-white font-medium mb-2">Q: {item.question}</p>
+                                <p className="text-gray-300">{item.answer}</p>
+                              </CardContent>
+                            </Card>
+                          ))}
+                        </div>
+                      </>
+                    )}
+
+                    {analysisContent.similarTopics && analysisContent.similarTopics.length > 0 && (
+                      <>
+                        <h3 className="text-xl font-semibold text-white mb-3">Similar Topics to Practice</h3>
+                        <div className="flex flex-wrap gap-2 mb-6">
+                          {analysisContent.similarTopics.map((topic, index) => (
+                            <Badge key={index} variant="secondary" className="text-green-400 border-green-400">
+                              {topic}
+                            </Badge>
+                          ))}
+                        </div>
+                      </>
+                    )}
+                  </>
+                ) : (
+                  <div className="text-center py-8">
+                    <p className="text-gray-400">No analysis available</p>
                   </div>
-
-                  <h3 className="text-xl font-semibold text-white mb-3">Detailed Analysis</h3>
-                  <div className="mb-6 text-gray-300 leading-relaxed">
-                    <ReactMarkdown>
-                      {analysisContent.detailedAnalysis}
-                    </ReactMarkdown>
-                  </div>
-
-                  {analysisContent.sideQuestions && analysisContent.sideQuestions.length > 0 && (
-                    <>
-                      <h3 className="text-xl font-semibold text-white mb-3">Side Questions & Answers</h3>
-                      <div className="space-y-4 mb-6">
-                        {analysisContent.sideQuestions.map((qa, index) => (
-                          <Card key={index} className="bg-gray-700 border-gray-600">
-                            <CardHeader>
-                              <CardTitle className="text-lg text-white">Q: {qa.question}</CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                              <p className="text-gray-300">A: {qa.answer}</p>
-                            </CardContent>
-                          </Card>
-                        ))}
-                      </div>
-                    </>
-                  )}
-
-                  {analysisContent.similarTopics && analysisContent.similarTopics.length > 0 && (
-                    <>
-                      <h3 className="text-xl font-semibold text-white mb-3">Similar Topics to Practice</h3>
-                      <div className="flex flex-wrap gap-2 mb-6">
-                        {analysisContent.similarTopics.map((topic, index) => (
-                          <Badge key={index} variant="secondary" className="text-gray-300 border-gray-500">{topic}</Badge>
-                        ))}
-                      </div>
-                    </>
-                  )}
-                </>
-              ) : (
-                <div className="text-red-400">Error loading analysis.</div>
-              )}
-            </div>
-          </section>
-
-          <section id="next-steps" className="scroll-mt-20">
-             <h2 className="text-2xl font-semibold text-green-400 mb-4">Next Steps</h2>
-             <Button
-                onClick={handleTryAgain}
-                className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition-transform transform hover:scale-105"
-              >
-                <Repeat className="h-5 w-5 mr-2 inline-block" />
-                Try Explaining Again
-              </Button>
-          </section>
-        </main>
-
-        {/* Sidebar */}
-        <aside className="hidden lg:block lg:col-span-1 h-fit sticky top-24">
-          <div className="bg-gray-800/50 rounded-lg p-6 shadow-lg border border-gray-700">
-            <h3 className="text-xl font-bold text-white mb-4 border-b border-gray-600 pb-2">Contents</h3>
-            <ul className="space-y-3 text-gray-300">
-              <li><a href="#your-explanation" className="hover:text-green-400 transition-colors">1. Your Explanation</a></li>
-              <li><a href="#gemini-feedback" className="hover:text-green-400 transition-colors">2. Gemini&apos;s Feedback</a></li>
-              <li><a href="#next-steps" className="hover:text-green-400 transition-colors">3. Next Steps</a></li>
-            </ul>
+                )}
+              </div>
+            </section>
           </div>
-        </aside>
 
+          {/* Right Column - Actions & Stats */}
+          <div className="space-y-6">
+            <Card className="bg-gray-800/50 border-gray-700">
+              <CardHeader>
+                <CardTitle className="text-white">Session Info</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="flex justify-between">
+                  <span className="text-gray-400">Topic:</span>
+                  <span className="text-white">{topic}</span>
+                </div>
+                {subtopic && (
+                  <div className="flex justify-between">
+                    <span className="text-gray-400">Subtopic:</span>
+                    <span className="text-white">{subtopic}</span>
+                  </div>
+                )}
+                <div className="flex justify-between">
+                  <span className="text-gray-400">Exam:</span>
+                  <span className="text-white">{exam}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-400">Subject:</span>
+                  <span className="text-white">{subject}</span>
+                </div>
+                {duration && (
+                  <div className="flex justify-between">
+                    <span className="text-gray-400">Duration:</span>
+                    <span className="text-white">{Math.round(parseInt(duration) / 60)}m {parseInt(duration) % 60}s</span>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            <div className="space-y-4">
+              <Button
+                onClick={handleTryAgain}
+                className="w-full bg-green-600 hover:bg-green-700 text-white"
+              >
+                <Repeat className="h-4 w-4 mr-2" />
+                Try Again
+              </Button>
+              
+              <Button
+                onClick={() => router.push('/select-topic')}
+                variant="outline"
+                className="w-full border-green-500 text-green-400 hover:bg-green-500/10"
+              >
+                Practice New Topic
+              </Button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
-}
+};
 
 export default AnalysisClient; 

@@ -40,6 +40,11 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 - **React Speech Recognition** - Voice recording
 - **Sonner** - Toast notifications
 
+## Database
+
+- **MongoDB** - Chosen for the flexibility required for a startup.
+- **Mongoose** - Used over Prisma for its vector search capabilities.
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:

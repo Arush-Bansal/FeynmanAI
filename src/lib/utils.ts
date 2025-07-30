@@ -1,21 +1,18 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
-import { EXAM_CATEGORIES } from "@/features/content-library";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-export function getSelectedExam(): string | null {
+export function getStoredExamCategory(): string | null {
   if (typeof window === 'undefined') return null;
   const storedExam = localStorage.getItem('selectedExamCategory');
-  return storedExam && EXAM_CATEGORIES.includes(storedExam as typeof EXAM_CATEGORIES[number]) ? storedExam : null;
+  return storedExam || null;
 }
 
-export function clearUserData(): void {
+export function clearUserData() {
   if (typeof window === 'undefined') return;
-  
-  // Clear all user-related localStorage items
   localStorage.removeItem('selectedExamCategory');
-  // Add any other user-related localStorage items here in the future
+  // Add any other user data that needs to be cleared
 }

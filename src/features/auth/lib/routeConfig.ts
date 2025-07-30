@@ -22,6 +22,7 @@ const ROUTE_CONFIG: RouteConfig[] = [
   { path: '/auth/signin', requiresAuth: false, requiresExamSelection: false },
   { path: '/auth/error', requiresAuth: false, requiresExamSelection: false },
   { path: '/profile', requiresAuth: true, requiresExamSelection: false, redirectTo: '/auth/signin' },
+  { path: '/history', requiresAuth: true, requiresExamSelection: false, redirectTo: '/auth/signin' },
   { path: '/select-topic', requiresAuth: true, requiresExamSelection: true, redirectTo: '/auth/signin', examSelectionRedirect: '/exam-selection' },
   { path: '/custom-topic', requiresAuth: false, requiresExamSelection: false },
   { path: '/exam-selection', requiresAuth: true, requiresExamSelection: false, redirectTo: '/auth/signin' },

@@ -2,9 +2,10 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Navigation } from "@/components/Navigation";
-import { RouteProtection } from "@/features/route-protection/RouteProtection";
-import { SessionWrapper } from "@/components/SessionWrapper";
+import { RouteProtection } from "@/features/auth/components/RouteProtection";
+import { SessionWrapper } from "@/features/auth/lib/SessionWrapper";
 import { ReactQueryProvider } from "@/components/ReactQueryProvider";
+
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

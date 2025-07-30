@@ -1,12 +1,15 @@
 import { useQuery } from '@tanstack/react-query';
-import { backendApi } from '@/lib/axios';
+import { backendApi } from '@/lib/api';
 
 interface FeynmanAnalysisProps {
   topic: string;
   exam: string;
   subject: string;
+  subtopic?: string;
   keyPoints: string[];
   transcript: string;
+  sessionId?: string;
+  duration?: number;
   enabled?: boolean;
 }
 
@@ -41,14 +44,14 @@ const fetchFeynmanAnalysis = async (params: FeynmanAnalysisProps): Promise<Feynm
   return res.data;
 };
 
-export const useFetchFeynmanAnalysis = ({ topic, exam, subject, keyPoints, transcript, enabled = true }: FeynmanAnalysisProps) => {
+export const useFetchFeynmanAnalysis = ({ topic, exam, subject, subtopic, keyPoints, transcript, sessionId, duration, enabled = true }: FeynmanAnalysisProps) => {
   const {
     data: geminiResponse,
     isLoading: isGeminiLoading,
     error: geminiError,
   } = useQuery<FeynmanApiResponse>({
-    queryKey: ['feynman-analysis', topic, exam, subject, keyPoints, transcript],
-    queryFn: () => fetchFeynmanAnalysis({ topic, exam, subject, keyPoints, transcript }),
+    queryKey: ['feynman-analysis', topic, exam, subject, subtopic, keyPoints, transcript, sessionId, duration],
+    queryFn: () => fetchFeynmanAnalysis({ topic, exam, subject, subtopic, keyPoints, transcript, sessionId, duration }),
     enabled: enabled && !!topic && !!exam && !!subject && !!transcript,
     staleTime: Infinity,
     gcTime: Infinity,
