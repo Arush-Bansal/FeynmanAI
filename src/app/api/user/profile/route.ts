@@ -6,7 +6,7 @@ import { getPracticeSessionStats } from '@/features/db/data/practiceSessions';
 import { getAnalyticsSummary } from '@/features/db/data/analytics';
 import dbConnect from '@/features/db/dbConnect';
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     await dbConnect();
     

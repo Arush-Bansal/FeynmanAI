@@ -2,10 +2,8 @@ import 'dotenv/config';
 import dbConnect from './dbConnect';
 import { createSubtopic } from './data/subtopics';
 import { createConcept } from './data/concepts';
-import { getSubtopicByCode } from './data/subtopics';
 import { getTopicByCode } from './data/topics';
 import { ISubtopic } from './models/Subtopic';
-import { IConcept } from './models/Concept';
 import { ITopic } from './models';
 
 // Multi-level subtopic structure with concepts

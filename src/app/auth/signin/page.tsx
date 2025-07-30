@@ -1,7 +1,7 @@
 "use client";
 
 import { useSearchParams } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, Suspense } from 'react';
 import { signIn, useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -130,4 +130,10 @@ const SignInPage = () => {
   );
 };
 
-export default SignInPage; 
+const SignInPageWithSuspense = () => (
+  <Suspense fallback={<div>Loading...</div>}>
+    <SignInPage />
+  </Suspense>
+);
+
+export default SignInPageWithSuspense; 

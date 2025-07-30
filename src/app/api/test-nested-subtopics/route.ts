@@ -1,10 +1,10 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { getSubtopicsByTopic } from '@/features/db/data/subtopics';
 import { getSubtopicByCode } from '@/features/db/data/subtopics';
 import { getSubtopicTree } from '@/features/db/data/subtopics';
 import dbConnect from '@/features/db/dbConnect';
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     await dbConnect();
     

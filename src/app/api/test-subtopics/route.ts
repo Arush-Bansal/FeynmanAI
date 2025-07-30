@@ -1,11 +1,11 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { getSubtopicsByTopic } from '@/features/db/data/subtopics';
 import { getTopicsBySubject } from '@/features/db/data/topics';
 import { getSubjectsByExam } from '@/features/db/data/subjects';
 import { getExamByCode } from '@/features/db/data/exams';
 import dbConnect from '@/features/db/dbConnect';
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     await dbConnect();
     

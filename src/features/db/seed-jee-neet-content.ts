@@ -3,10 +3,9 @@ import dbConnect from './dbConnect';
 import { createSubject } from './data/subjects';
 import { createTopic } from './data/topics';
 import { createSubtopic } from './data/subtopics';
-import { Exam, IExam } from './models/Exam';
+import { Exam } from './models/Exam';
 import { ISubject } from './models/Subject';
 import { ITopic } from './models/Topic';
-import { ISubtopic } from './models/Subtopic';
 
 // Subject data - shared between JEE and NEET where applicable
 const subjects = {

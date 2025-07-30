@@ -9,7 +9,7 @@ import {
   updateUserStatus,
   deactivateUser,
   activateUser,
-  getUserById,
+  
   getUserByEmail
 } from '@/features/db/data/users';
 import { isAdmin, isSuperAdmin } from '@/features/db/utils/adminUtils';

@@ -16,8 +16,7 @@ import {
   XCircle,
   BarChart3
 } from "lucide-react";
-import { getPracticeSessionsByUser } from "@/features/db/data/practiceSessions";
-import { getPracticeSessionStats } from "@/features/db/data/practiceSessions";
+
 
 interface PracticeSession {
   _id: string;

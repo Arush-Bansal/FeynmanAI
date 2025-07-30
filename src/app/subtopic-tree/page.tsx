@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense, useCallback } from 'react';
 import { toast } from "sonner";
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from "@/components/ui/button";
@@ -36,14 +36,7 @@ const SubtopicTreePage = () => {
   const subjectId = searchParams.get('subject');
   const topicId = searchParams.get('topic');
 
-  useEffect(() => {
-    if (topicId) {
-      fetchSubtopics();
-      fetchTopic();
-    }
-  }, [topicId]);
-
-  const fetchSubtopics = async () => {
+  const fetchSubtopics = useCallback(async () => {
     try {
       console.log('Fetching subtopics for topicId:', topicId);
       const response = await fetch(`/api/subtopics?topic=${topicId}`);
@@ -96,9 +89,9 @@ const SubtopicTreePage = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [topicId]);
 
-  const fetchTopic = async () => {
+  const fetchTopic = useCallback(async () => {
     try {
       console.log('Fetching topic for topicId:', topicId);
       const response = await fetch(`/api/topics/${topicId}`);
@@ -114,7 +107,14 @@ const SubtopicTreePage = () => {
     } catch (error) {
       console.error('Error fetching topic:', error);
     }
-  };
+  }, [topicId]);
+
+  useEffect(() => {
+    if (topicId) {
+      fetchSubtopics();
+      fetchTopic();
+    }
+  }, [topicId, fetchSubtopics, fetchTopic]);
 
   const toggleNode = (nodeId: string) => {
     const newExpanded = new Set(expandedNodes);
@@ -298,4 +298,10 @@ const SubtopicTreePage = () => {
   );
 };
 
-export default SubtopicTreePage; 
+const SubtopicTreePageWithSuspense = () => (
+    <Suspense fallback={<div>Loading...</div>}>
+        <SubtopicTreePage />
+    </Suspense>
+);
+
+export default SubtopicTreePageWithSuspense;

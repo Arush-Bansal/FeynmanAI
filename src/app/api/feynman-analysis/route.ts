@@ -47,7 +47,7 @@ export async function POST(request: Request) {
     }
 
     const requestBody = await request.json();
-    const { topic, exam, subject, subtopic, keyPoints, transcript, sessionId, duration } = requestBody;
+    const { topic, exam, subject, subtopic, keyPoints, transcript, sessionId } = requestBody;
     
     // Validate required fields
     console.log('Validating required fields...');

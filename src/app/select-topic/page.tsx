@@ -50,9 +50,7 @@ const SelectTopicPage = () => {
   // Get topic content for selected topic
   const selectedSubjectData = subjects.find((s: Subject) => s._id === selectedSubject);
   const selectedTopicData = topics.find((t: Topic) => t._id === topic);
-  const {
-    data: topicContent
-  } = useTopicContent(selectedExamCategory, selectedSubjectData?.name || null, selectedTopicData?.name || null);
+  const {} = useTopicContent(selectedExamCategory, selectedSubjectData?.name || null, selectedTopicData?.name || null);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
