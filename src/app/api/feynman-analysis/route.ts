@@ -1,23 +1,53 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';  
 import { NextResponse } from 'next/server';  
 import { config } from 'dotenv';
-import { authOptions } from "@/app/api/auth/[...nextauth]/route"
+import { authOptions } from "@/lib/auth"
 import { analyzeFeynmanExplanationTool, generateFeynmanPrompt } from '@/features/gemini';
 import { getServerSession } from 'next-auth';
+import dbConnect from '@/features/db/dbConnect';
+import { getUserByEmail } from '@/features/db/data/users';
+import { completePracticeSession } from '@/features/db/data/practiceSessions';
 
 config();
+
+// Function to transform Gemini analysis to database format
+const transformAnalysisToDbFormat = (analysis: Record<string, unknown>) => {
+  return {
+    coveredTopics: Array.isArray(analysis.coveredTopics) 
+      ? analysis.coveredTopics.map((item: Record<string, unknown>) => String(item.topicName || '')).filter(Boolean) 
+      : [],
+    missedTopics: Array.isArray(analysis.coveredTopics) 
+      ? analysis.coveredTopics.filter((item: Record<string, unknown>) => !item.covered).map((item: Record<string, unknown>) => String(item.topicName || '')).filter(Boolean) 
+      : [],
+    detailedAnalysis: typeof analysis.detailedAnalysis === 'string' ? analysis.detailedAnalysis : '',
+    sideQuestions: Array.isArray(analysis.sideQuestions) 
+      ? analysis.sideQuestions.map((item: Record<string, unknown>) => `${String(item.question || '')}: ${String(item.answer || '')}`).filter(Boolean) 
+      : [],
+    similarTopics: Array.isArray(analysis.similarTopics) ? analysis.similarTopics.map(item => String(item)) : [],
+    overallScore: typeof analysis.overallScore === 'number' ? analysis.overallScore : 0,
+    strengths: [], // Will be extracted from detailedAnalysis if needed
+    weaknesses: [], // Will be extracted from detailedAnalysis if needed
+    recommendations: [] // Will be extracted from detailedAnalysis if needed
+  };
+};
 
 export async function POST(request: Request) {  
   const session = await getServerSession(authOptions);
 
-  if (!session?.user) {
+  if (!session?.user?.email) {
     return NextResponse.json({ error: "Authentication required" }, { status: 401 });
   }
 ;
   
   try {
+    await dbConnect();
+    const user = await getUserByEmail(session.user.email);
+    if (!user) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
+
     const requestBody = await request.json();
-    const { topic, exam, subject, subtopic, keyPoints, transcript } = requestBody;
+    const { topic, exam, subject, subtopic, keyPoints, transcript, sessionId, duration } = requestBody;
     
     // Validate required fields
     console.log('Validating required fields...');
@@ -54,23 +84,34 @@ export async function POST(request: Request) {
     const result = await model.generateContent([prompt]);  
     const response = result.response;
     
-    // const apiCallDuration = Date.now() - apiCallStart;
     const responseText = response.text();
     if (response.candidates?.[0]?.content?.parts?.[0]?.functionCall) {
       const functionCall = response.candidates[0].content.parts[0].functionCall;
-      // const analysis = functionCall.args;
+      const analysis = functionCall.args as Record<string, unknown>;
 
-      // await dbConnect();
-      // await createFeynmanAnalysis({
-      //   user: session.user.id,
-        // topic,
-        // exam,
-        // subject,
-        // keyPoints,
-        // transcript,
-        // analysis,
-      // });
-// 
+      // Save the analysis to the database if sessionId is provided
+      if (sessionId) {
+        console.log(`Attempting to save analysis for sessionId: ${sessionId}`);
+        try {
+          // Transform the analysis to match database schema
+          const dbAnalysis = transformAnalysisToDbFormat(analysis);
+          console.log("Transformed analysis for DB:", JSON.stringify(dbAnalysis, null, 2));
+          
+          // Update the practice session with the analysis
+          const updatedSession = await completePracticeSession(sessionId, dbAnalysis);
+          if (updatedSession) {
+            console.log('Analysis saved to database successfully for session:', updatedSession._id);
+          } else {
+            console.log('Could not find practice session to update for sessionId:', sessionId);
+          }
+        } catch (dbError) {
+          console.error('Error saving analysis to database:', dbError);
+          // Continue with the response even if database save fails
+        }
+      } else {
+        console.log("No sessionId provided, skipping database save.");
+      }
+
       const responseToFrontend = {
         functionCall: functionCall,
         error: undefined

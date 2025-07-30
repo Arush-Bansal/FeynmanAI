@@ -5,8 +5,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { AlertTriangle, ArrowLeft, RefreshCw } from 'lucide-react';
 import Link from 'next/link';
+import { Suspense } from 'react';
 
-const AuthErrorPage = () => {
+const AuthErrorContent = () => {
   const searchParams = useSearchParams();
   const error = searchParams.get('error');
 
@@ -90,6 +91,32 @@ const AuthErrorPage = () => {
         </Card>
       </div>
     </div>
+  );
+};
+
+const AuthErrorPage = () => {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 p-4">
+        <div className="w-full max-w-md">
+          <Card className="bg-gray-900/50 border-gray-700 backdrop-blur-sm shadow-2xl">
+            <CardHeader className="text-center pb-4">
+              <div className="mx-auto mb-4 w-16 h-16 bg-red-600/20 rounded-full flex items-center justify-center">
+                <AlertTriangle className="h-8 w-8 text-red-400" />
+              </div>
+              <CardTitle className="text-2xl font-bold text-white">
+                Loading...
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="text-center">
+              <p className="text-gray-300 text-lg">Loading error details...</p>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    }>
+      <AuthErrorContent />
+    </Suspense>
   );
 };
 

@@ -164,7 +164,7 @@ const SelectTopicPage = () => {
                   variant="outline"
                   className={`w-full h-auto py-2 px-3 text-left text-lg font-semibold rounded-lg transition-all duration-200 ease-in-out transform hover:scale-105
                     ${selectedSubject === subject._id
-                      ? 'bg-green-600 text-white border-green-600 shadow-lg'
+                      ? 'bg-transparent text-green-400 border-green-400 shadow-lg hover:bg-gray-700 hover:text-green-400'
                       : 'bg-gray-800 text-gray-200 border-gray-700 hover:bg-gray-700 hover:border-gray-600'
                     }`}
                   onClick={() => handleSubjectSelect(subject._id)}
@@ -182,7 +182,7 @@ const SelectTopicPage = () => {
         <div className="mb-8">
           <div className="flex items-center gap-2 mb-4">
             <GraduationCap className="h-5 w-5 text-green-400" />
-            <h3 className="text-xl font-semibold text-white">Choose Your Topic for {selectedSubject}</h3>
+            <h3 className="text-xl font-semibold text-white">Choose Your Topic for {selectedSubjectData?.name || selectedSubject}</h3>
           </div>
           {isLoadingTopics ? (
             <div className="flex items-center justify-center py-8">
@@ -201,7 +201,7 @@ const SelectTopicPage = () => {
                   variant="outline"
                   className={`w-full h-auto py-2 px-3 text-left text-lg font-semibold rounded-lg transition-all duration-200 ease-in-out transform hover:scale-105
                     ${topic === topicItem._id
-                      ? 'bg-green-600 text-white border-green-600 shadow-lg'
+                      ? 'bg-transparent text-green-400 border-green-400 shadow-lg hover:bg-gray-700 hover:text-green-400'
                       : 'bg-gray-800 text-gray-200 border-gray-700 hover:bg-gray-700 hover:border-gray-600'
                     }`}
                   onClick={() => handleTopicSelect(topicItem._id)}

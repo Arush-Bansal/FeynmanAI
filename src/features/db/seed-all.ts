@@ -2,6 +2,7 @@ import 'dotenv/config';
 import { seedExams } from './seed-exams';
 import { seedNeetPgUpsc } from './seed-neet-pg-upsc';
 import { seedJeeNeetContent } from './seed-jee-neet-content';
+import { seedMultiLevelContent } from './seed-multi-level-content';
 
 export async function seedAll() {
   try {
@@ -22,13 +23,21 @@ export async function seedAll() {
     await seedNeetPgUpsc();
     console.log('✅ NEET PG and UPSC exams seeded successfully!\n');
 
+    // Seed multi-level content with concepts
+    console.log('📚 Step 4: Seeding multi-level content with concepts...');
+    await seedMultiLevelContent();
+    console.log('✅ Multi-level content with concepts seeded successfully!\n');
+
     console.log('🎉 All seeding operations completed successfully!');
     console.log('\n📊 Summary:');
-    console.log('   • JEE exam with 3 subjects, 15 topics, and 25 subtopics');
-    console.log('   • NEET exam with 3 subjects, 15 topics, and 25 subtopics');
-    console.log('   • NEET PG exam with 5 subjects, 15 topics, and 15 subtopics');
-    console.log('   • UPSC exam with 5 subjects, 15 topics, and 15 subtopics');
+    console.log('   • JEE exam with 3 subjects, 15 topics, and 75 subtopics');
+    console.log('   • NEET exam with 3 subjects, 15 topics, and 75 subtopics');
+    console.log('   • NEET PG exam with 5 subjects, 15 topics, and 45 subtopics');
+    console.log('   • UPSC exam with 5 subjects, 15 topics, and 45 subtopics');
+    console.log('   • Multi-level subtopics: 4 levels deep with concepts');
+    console.log('   • Concepts: Beginner, Intermediate, and Advanced difficulty levels');
     console.log('   • Total: 4 exams with comprehensive content structure');
+    console.log('   • No duplications - each exam has unique content structure');
   } catch (error) {
     console.error('❌ Error during comprehensive seeding:', error);
     throw error;

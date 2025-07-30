@@ -23,12 +23,23 @@ if (!globalThis.mongoose) {
 
 async function dbConnect() {
   if (cached.conn) {
-    return cached.conn;
+    // Check if the cached connection is still valid
+    if (mongoose.connection.readyState === 1) {
+      return cached.conn;
+    } else {
+      // Connection is stale, clear it
+      cached.conn = null;
+      cached.promise = null;
+    }
   }
 
   if (!cached.promise) {
     const opts = {
       bufferCommands: false,
+      maxPoolSize: 1, // Optimize for serverless - one connection per instance
+      serverSelectionTimeoutMS: 5000, // Faster timeout for serverless
+      socketTimeoutMS: 45000, // Reasonable socket timeout
+      family: 4 // Force IPv4 for better compatibility
     };
 
     if (!MONGODB_URI) {
@@ -38,6 +49,11 @@ async function dbConnect() {
     cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
       console.log('✅ Database connected successfully');
       return mongoose;
+    }).catch((error) => {
+      // Clear the promise on error so we can retry
+      cached.promise = null;
+      console.error('❌ Database connection failed:', error);
+      throw error;
     });
   }
   cached.conn = await cached.promise;

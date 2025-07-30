@@ -1,6 +1,5 @@
 import 'dotenv/config';
 import dbConnect from './dbConnect';
-import { createExam } from './data/exams';
 import { createSubject } from './data/subjects';
 import { createTopic } from './data/topics';
 import { createSubtopic } from './data/subtopics';
@@ -9,64 +8,32 @@ import { ISubject } from './models/Subject';
 import { ITopic } from './models/Topic';
 import { ISubtopic } from './models/Subtopic';
 
-// Exam data for JEE and NEET
-const examData = [
-  {
-    name: 'JEE',
-    code: 'JEE',
-    description: 'Engineering Entrance',
-    icon: '/images/jee-icon.svg',
-    gradient: 'from-blue-700 to-blue-900',
-  },
-  {
-    name: 'NEET',
-    code: 'NEET',
-    description: 'Medical Entrance',
-    icon: '/images/neet-icon.svg',
-    gradient: 'from-green-700 to-green-900',
-  },
-];
-
-// Subject data for JEE
-const jeeSubjects = [
-  {
+// Subject data - shared between JEE and NEET where applicable
+const subjects = {
+  PHYSICS: {
     name: 'Physics',
     code: 'PHYSICS',
     description: 'Study of matter, energy, and their interactions',
   },
-  {
+  CHEMISTRY: {
     name: 'Chemistry',
     code: 'CHEMISTRY',
     description: 'Study of substances and their properties',
   },
-  {
+  MATHEMATICS: {
     name: 'Mathematics',
     code: 'MATHEMATICS',
     description: 'Study of numbers, quantities, and shapes',
   },
-];
-
-// Subject data for NEET
-const neetSubjects = [
-  {
-    name: 'Physics',
-    code: 'PHYSICS',
-    description: 'Study of matter, energy, and their interactions',
-  },
-  {
-    name: 'Chemistry',
-    code: 'CHEMISTRY',
-    description: 'Study of substances and their properties',
-  },
-  {
+  BIOLOGY: {
     name: 'Biology',
     code: 'BIOLOGY',
     description: 'Study of living organisms and life processes',
   },
-];
+};
 
-// Topic data for JEE subjects
-const jeeTopics = {
+// Topic data - shared between JEE and NEET where applicable
+const topics = {
   PHYSICS: [
     { name: 'Mechanics', code: 'MECHANICS', description: 'Study of motion and forces' },
     { name: 'Thermodynamics', code: 'THERMODYNAMICS', description: 'Study of heat and energy' },
@@ -88,99 +55,24 @@ const jeeTopics = {
     { name: 'Trigonometry', code: 'TRIGONOMETRY', description: 'Study of triangles and angles' },
     { name: 'Statistics', code: 'STATISTICS', description: 'Study of data collection and analysis' },
   ],
-};
-
-// Topic data for NEET subjects
-const neetTopics = {
-  PHYSICS: [
-    { name: 'Mechanics', code: 'MECHANICS', description: 'Study of motion and forces' },
-    { name: 'Thermodynamics', code: 'THERMODYNAMICS', description: 'Study of heat and energy' },
-    { name: 'Electromagnetism', code: 'ELECTROMAGNETISM', description: 'Study of electric and magnetic fields' },
-    { name: 'Optics', code: 'OPTICS', description: 'Study of light and its properties' },
-    { name: 'Modern Physics', code: 'MODERN_PHYSICS', description: 'Study of quantum mechanics and relativity' },
-  ],
-  CHEMISTRY: [
-    { name: 'Physical Chemistry', code: 'PHYSICAL_CHEMISTRY', description: 'Study of physical principles in chemistry' },
-    { name: 'Organic Chemistry', code: 'ORGANIC_CHEMISTRY', description: 'Study of carbon compounds' },
-    { name: 'Inorganic Chemistry', code: 'INORGANIC_CHEMISTRY', description: 'Study of non-carbon compounds' },
-    { name: 'Analytical Chemistry', code: 'ANALYTICAL_CHEMISTRY', description: 'Study of chemical analysis methods' },
-    { name: 'Coordination Chemistry', code: 'COORDINATION_CHEMISTRY', description: 'Study of complex compounds' },
-  ],
   BIOLOGY: [
     { name: 'Botany', code: 'BOTANY', description: 'Study of plants and plant life' },
     { name: 'Zoology', code: 'ZOOLOGY', description: 'Study of animals and animal life' },
-    { name: 'Cell Biology', code: 'CELL_BIOLOGY', description: 'Study of cell structure and function' },
+    { name: 'Cell Biology', code: 'CELL_BIOLOGY', description: 'Study of cells and their functions' },
     { name: 'Genetics', code: 'GENETICS', description: 'Study of heredity and variation' },
     { name: 'Ecology', code: 'ECOLOGY', description: 'Study of organisms and their environment' },
   ],
 };
 
-// Subtopic data for JEE topics with nested structure
-const jeeSubtopics = {
+// Subtopic data - shared between JEE and NEET where applicable
+const subtopics = {
+  // Physics subtopics
   MECHANICS: [
     { name: 'Kinematics', code: 'KINEMATICS', description: 'Study of motion without considering forces' },
     { name: 'Dynamics', code: 'DYNAMICS', description: 'Study of motion with forces' },
     { name: 'Work and Energy', code: 'WORK_ENERGY', description: 'Study of work, energy, and power' },
     { name: 'Momentum', code: 'MOMENTUM', description: 'Study of linear and angular momentum' },
     { name: 'Gravitation', code: 'GRAVITATION', description: 'Study of gravitational forces' },
-  ],
-  // Nested subtopics under Kinematics
-  KINEMATICS: [
-    { name: 'Linear Motion', code: 'LINEAR_MOTION', description: 'Motion in a straight line' },
-    { name: 'Circular Motion', code: 'CIRCULAR_MOTION', description: 'Motion along a circular path' },
-    { name: 'Projectile Motion', code: 'PROJECTILE_MOTION', description: 'Motion under gravity' },
-    { name: 'Relative Motion', code: 'RELATIVE_MOTION', description: 'Motion from different reference frames' },
-    { name: 'Kinematic Equations', code: 'KINEMATIC_EQUATIONS', description: 'Mathematical equations of motion' },
-  ],
-  // Nested subtopics under Linear Motion
-  LINEAR_MOTION: [
-    { name: 'Uniform Motion', code: 'UNIFORM_MOTION', description: 'Constant velocity motion' },
-    { name: 'Accelerated Motion', code: 'ACCELERATED_MOTION', description: 'Motion with changing velocity' },
-    { name: 'Free Fall', code: 'FREE_FALL', description: 'Motion under gravity only' },
-  ],
-  // Nested subtopics under Circular Motion
-  CIRCULAR_MOTION: [
-    { name: 'Uniform Circular Motion', code: 'UNIFORM_CIRCULAR_MOTION', description: 'Constant speed circular motion' },
-    { name: 'Non-Uniform Circular Motion', code: 'NON_UNIFORM_CIRCULAR_MOTION', description: 'Variable speed circular motion' },
-    { name: 'Banking of Roads', code: 'BANKING_OF_ROADS', description: 'Curved road banking' },
-  ],
-  // Nested subtopics under Dynamics
-  DYNAMICS: [
-    { name: 'Newton\'s Laws', code: 'NEWTONS_LAWS', description: 'Fundamental laws of motion' },
-    { name: 'Friction', code: 'FRICTION', description: 'Resistance to motion' },
-    { name: 'Centripetal Force', code: 'CENTRIPETAL_FORCE', description: 'Force for circular motion' },
-    { name: 'Tension', code: 'TENSION', description: 'Force in strings and ropes' },
-    { name: 'Normal Force', code: 'NORMAL_FORCE', description: 'Contact force perpendicular to surface' },
-  ],
-  // Nested subtopics under Newton's Laws
-  NEWTONS_LAWS: [
-    { name: 'First Law (Inertia)', code: 'NEWTONS_FIRST_LAW', description: 'Law of inertia' },
-    { name: 'Second Law (F = ma)', code: 'NEWTONS_SECOND_LAW', description: 'Force equals mass times acceleration' },
-    { name: 'Third Law (Action-Reaction)', code: 'NEWTONS_THIRD_LAW', description: 'Equal and opposite forces' },
-  ],
-  // Nested subtopics under Work and Energy
-  WORK_ENERGY: [
-    { name: 'Work Done', code: 'WORK_DONE', description: 'Energy transferred by force' },
-    { name: 'Kinetic Energy', code: 'KINETIC_ENERGY', description: 'Energy of motion' },
-    { name: 'Potential Energy', code: 'POTENTIAL_ENERGY', description: 'Stored energy' },
-    { name: 'Conservation of Energy', code: 'ENERGY_CONSERVATION', description: 'Total energy remains constant' },
-    { name: 'Power', code: 'POWER', description: 'Rate of doing work' },
-  ],
-  // Nested subtopics under Momentum
-  MOMENTUM: [
-    { name: 'Linear Momentum', code: 'LINEAR_MOMENTUM', description: 'Product of mass and velocity' },
-    { name: 'Conservation of Momentum', code: 'MOMENTUM_CONSERVATION', description: 'Momentum remains constant' },
-    { name: 'Impulse', code: 'IMPULSE', description: 'Change in momentum' },
-    { name: 'Collisions', code: 'COLLISIONS', description: 'Interaction between objects' },
-    { name: 'Angular Momentum', code: 'ANGULAR_MOMENTUM', description: 'Rotational momentum' },
-  ],
-  // Nested subtopics under Gravitation
-  GRAVITATION: [
-    { name: 'Universal Law of Gravitation', code: 'UNIVERSAL_GRAVITATION', description: 'Newton\'s law of gravity' },
-    { name: 'Gravitational Field', code: 'GRAVITATIONAL_FIELD', description: 'Space around massive objects' },
-    { name: 'Gravitational Potential', code: 'GRAVITATIONAL_POTENTIAL', description: 'Potential energy in gravity' },
-    { name: 'Satellite Motion', code: 'SATELLITE_MOTION', description: 'Orbital motion' },
-    { name: 'Escape Velocity', code: 'ESCAPE_VELOCITY', description: 'Speed to escape gravity' },
   ],
   THERMODYNAMICS: [
     { name: 'Laws of Thermodynamics', code: 'THERMODYNAMICS_LAWS', description: 'Fundamental laws of thermodynamics' },
@@ -196,6 +88,22 @@ const jeeSubtopics = {
     { name: 'AC Circuits', code: 'AC_CIRCUITS', description: 'Study of alternating current circuits' },
     { name: 'Electromagnetic Waves', code: 'ELECTROMAGNETIC_WAVES', description: 'Study of light and radio waves' },
   ],
+  OPTICS: [
+    { name: 'Geometric Optics', code: 'GEOMETRIC_OPTICS', description: 'Study of light rays and reflection/refraction' },
+    { name: 'Wave Optics', code: 'WAVE_OPTICS', description: 'Study of light as waves' },
+    { name: 'Interference', code: 'INTERFERENCE', description: 'Study of wave interference patterns' },
+    { name: 'Diffraction', code: 'DIFFRACTION', description: 'Study of light bending around obstacles' },
+    { name: 'Polarization', code: 'POLARIZATION', description: 'Study of light wave orientation' },
+  ],
+  MODERN_PHYSICS: [
+    { name: 'Photoelectric Effect', code: 'PHOTOELECTRIC_EFFECT', description: 'Study of light-matter interaction' },
+    { name: 'Atomic Structure', code: 'ATOMIC_STRUCTURE_PHYSICS', description: 'Study of atom composition and energy levels' },
+    { name: 'Nuclear Physics', code: 'NUCLEAR_PHYSICS', description: 'Study of atomic nuclei and radioactivity' },
+    { name: 'Relativity', code: 'RELATIVITY', description: 'Study of space-time and mass-energy' },
+    { name: 'Quantum Mechanics', code: 'QUANTUM_MECHANICS', description: 'Study of matter at atomic scale' },
+  ],
+  
+  // Chemistry subtopics
   PHYSICAL_CHEMISTRY: [
     { name: 'Atomic Structure', code: 'ATOMIC_STRUCTURE', description: 'Study of atom composition and properties' },
     { name: 'Chemical Bonding', code: 'CHEMICAL_BONDING', description: 'Study of how atoms combine' },
@@ -210,6 +118,29 @@ const jeeSubtopics = {
     { name: 'Carboxylic Acids', code: 'CARBOXYLIC_ACIDS', description: 'Study of organic acids' },
     { name: 'Amines', code: 'AMINES', description: 'Study of nitrogen-containing compounds' },
   ],
+  INORGANIC_CHEMISTRY: [
+    { name: 'Periodic Table', code: 'PERIODIC_TABLE', description: 'Study of element organization and properties' },
+    { name: 'Chemical Bonding', code: 'INORGANIC_BONDING', description: 'Study of ionic and covalent bonds' },
+    { name: 'Coordination Compounds', code: 'COORDINATION_COMPOUNDS', description: 'Study of complex metal compounds' },
+    { name: 'Acids and Bases', code: 'ACIDS_BASES', description: 'Study of acid-base reactions' },
+    { name: 'Redox Reactions', code: 'REDOX_REACTIONS', description: 'Study of oxidation-reduction reactions' },
+  ],
+  ANALYTICAL_CHEMISTRY: [
+    { name: 'Qualitative Analysis', code: 'QUALITATIVE_ANALYSIS', description: 'Study of identifying chemical species' },
+    { name: 'Quantitative Analysis', code: 'QUANTITATIVE_ANALYSIS', description: 'Study of measuring chemical amounts' },
+    { name: 'Titration', code: 'TITRATION', description: 'Study of volumetric analysis' },
+    { name: 'Gravimetric Analysis', code: 'GRAVIMETRIC_ANALYSIS', description: 'Study of mass-based analysis' },
+    { name: 'Instrumental Analysis', code: 'INSTRUMENTAL_ANALYSIS', description: 'Study of modern analytical techniques' },
+  ],
+  COORDINATION_CHEMISTRY: [
+    { name: 'Coordination Compounds', code: 'COORDINATION_COMPOUNDS_CHEM', description: 'Study of metal-ligand complexes' },
+    { name: 'Crystal Field Theory', code: 'CRYSTAL_FIELD_THEORY', description: 'Study of d-orbital splitting' },
+    { name: 'Valence Bond Theory', code: 'VALENCE_BOND_THEORY', description: 'Study of chemical bonding in complexes' },
+    { name: 'Isomerism', code: 'ISOMERISM', description: 'Study of different forms of same compound' },
+    { name: 'Applications', code: 'COORDINATION_APPLICATIONS', description: 'Real-world applications of complexes' },
+  ],
+  
+  // Mathematics subtopics
   ALGEBRA: [
     { name: 'Linear Equations', code: 'LINEAR_EQUATIONS', description: 'Study of first-degree equations' },
     { name: 'Quadratic Equations', code: 'QUADRATIC_EQUATIONS', description: 'Study of second-degree equations' },
@@ -224,72 +155,29 @@ const jeeSubtopics = {
     { name: 'Applications of Derivatives', code: 'APPLICATIONS_DERIVATIVES', description: 'Real-world uses of differentiation' },
     { name: 'Applications of Integrals', code: 'APPLICATIONS_INTEGRALS', description: 'Real-world uses of integration' },
   ],
-};
-
-// Subtopic data for NEET topics with nested structure
-const neetSubtopics = {
-  MECHANICS: [
-    { name: 'Kinematics', code: 'KINEMATICS', description: 'Study of motion without considering forces' },
-    { name: 'Dynamics', code: 'DYNAMICS', description: 'Study of motion with forces' },
-    { name: 'Work and Energy', code: 'WORK_ENERGY', description: 'Study of work, energy, and power' },
-    { name: 'Momentum', code: 'MOMENTUM', description: 'Study of linear and angular momentum' },
-    { name: 'Gravitation', code: 'GRAVITATION', description: 'Study of gravitational forces' },
+  GEOMETRY: [
+    { name: 'Coordinate Geometry', code: 'COORDINATE_GEOMETRY', description: 'Study of geometric figures using coordinates' },
+    { name: 'Conic Sections', code: 'CONIC_SECTIONS', description: 'Study of circles, ellipses, parabolas, hyperbolas' },
+    { name: '3D Geometry', code: '3D_GEOMETRY', description: 'Study of three-dimensional shapes' },
+    { name: 'Vectors', code: 'VECTORS', description: 'Study of directed quantities' },
+    { name: 'Lines and Planes', code: 'LINES_PLANES', description: 'Study of linear and planar geometry' },
   ],
-  // Nested subtopics under Kinematics (same as JEE)
-  KINEMATICS: [
-    { name: 'Linear Motion', code: 'LINEAR_MOTION', description: 'Motion in a straight line' },
-    { name: 'Circular Motion', code: 'CIRCULAR_MOTION', description: 'Motion along a circular path' },
-    { name: 'Projectile Motion', code: 'PROJECTILE_MOTION', description: 'Motion under gravity' },
-    { name: 'Relative Motion', code: 'RELATIVE_MOTION', description: 'Motion from different reference frames' },
-    { name: 'Kinematic Equations', code: 'KINEMATIC_EQUATIONS', description: 'Mathematical equations of motion' },
+  TRIGONOMETRY: [
+    { name: 'Trigonometric Functions', code: 'TRIG_FUNCTIONS', description: 'Study of sine, cosine, tangent functions' },
+    { name: 'Trigonometric Identities', code: 'TRIG_IDENTITIES', description: 'Study of trigonometric relationships' },
+    { name: 'Trigonometric Equations', code: 'TRIG_EQUATIONS', description: 'Study of equations involving trig functions' },
+    { name: 'Inverse Trigonometric Functions', code: 'INVERSE_TRIG', description: 'Study of arcsin, arccos, arctan' },
+    { name: 'Applications of Trigonometry', code: 'TRIG_APPLICATIONS', description: 'Real-world uses of trigonometry' },
   ],
-  // Nested subtopics under Linear Motion
-  LINEAR_MOTION: [
-    { name: 'Uniform Motion', code: 'UNIFORM_MOTION', description: 'Constant velocity motion' },
-    { name: 'Accelerated Motion', code: 'ACCELERATED_MOTION', description: 'Motion with changing velocity' },
-    { name: 'Free Fall', code: 'FREE_FALL', description: 'Motion under gravity only' },
+  STATISTICS: [
+    { name: 'Descriptive Statistics', code: 'DESCRIPTIVE_STATS', description: 'Study of data summarization' },
+    { name: 'Probability', code: 'PROBABILITY', description: 'Study of chance and likelihood' },
+    { name: 'Random Variables', code: 'RANDOM_VARIABLES', description: 'Study of variable outcomes' },
+    { name: 'Probability Distributions', code: 'PROBABILITY_DISTRIBUTIONS', description: 'Study of probability patterns' },
+    { name: 'Hypothesis Testing', code: 'HYPOTHESIS_TESTING', description: 'Study of statistical inference' },
   ],
-  // Nested subtopics under Circular Motion
-  CIRCULAR_MOTION: [
-    { name: 'Uniform Circular Motion', code: 'UNIFORM_CIRCULAR_MOTION', description: 'Constant speed circular motion' },
-    { name: 'Non-Uniform Circular Motion', code: 'NON_UNIFORM_CIRCULAR_MOTION', description: 'Variable speed circular motion' },
-    { name: 'Banking of Roads', code: 'BANKING_OF_ROADS', description: 'Curved road banking' },
-  ],
-  // Nested subtopics under Dynamics
-  DYNAMICS: [
-    { name: 'Newton\'s Laws', code: 'NEWTONS_LAWS', description: 'Fundamental laws of motion' },
-    { name: 'Friction', code: 'FRICTION', description: 'Resistance to motion' },
-    { name: 'Centripetal Force', code: 'CENTRIPETAL_FORCE', description: 'Force for circular motion' },
-    { name: 'Tension', code: 'TENSION', description: 'Force in strings and ropes' },
-    { name: 'Normal Force', code: 'NORMAL_FORCE', description: 'Contact force perpendicular to surface' },
-  ],
-  // Nested subtopics under Newton's Laws
-  NEWTONS_LAWS: [
-    { name: 'First Law (Inertia)', code: 'NEWTONS_FIRST_LAW', description: 'Law of inertia' },
-    { name: 'Second Law (F = ma)', code: 'NEWTONS_SECOND_LAW', description: 'Force equals mass times acceleration' },
-    { name: 'Third Law (Action-Reaction)', code: 'NEWTONS_THIRD_LAW', description: 'Equal and opposite forces' },
-  ],
-  THERMODYNAMICS: [
-    { name: 'Laws of Thermodynamics', code: 'THERMODYNAMICS_LAWS', description: 'Fundamental laws of thermodynamics' },
-    { name: 'Heat Transfer', code: 'HEAT_TRANSFER', description: 'Study of heat conduction, convection, and radiation' },
-    { name: 'Thermal Properties', code: 'THERMAL_PROPERTIES', description: 'Study of thermal expansion and specific heat' },
-    { name: 'Gas Laws', code: 'GAS_LAWS', description: 'Study of pressure, volume, and temperature relationships' },
-    { name: 'Entropy', code: 'ENTROPY', description: 'Study of disorder and energy distribution' },
-  ],
-  PHYSICAL_CHEMISTRY: [
-    { name: 'Atomic Structure', code: 'ATOMIC_STRUCTURE', description: 'Study of atom composition and properties' },
-    { name: 'Chemical Bonding', code: 'CHEMICAL_BONDING', description: 'Study of how atoms combine' },
-    { name: 'Chemical Kinetics', code: 'CHEMICAL_KINETICS', description: 'Study of reaction rates' },
-    { name: 'Chemical Equilibrium', code: 'CHEMICAL_EQUILIBRIUM', description: 'Study of reversible reactions' },
-    { name: 'Thermochemistry', code: 'THERMOCHEMISTRY', description: 'Study of heat in chemical reactions' },
-  ],
-  ORGANIC_CHEMISTRY: [
-    { name: 'Hydrocarbons', code: 'HYDROCARBONS', description: 'Study of compounds containing only carbon and hydrogen' },
-    { name: 'Alcohols and Ethers', code: 'ALCOHOLS_ETHERS', description: 'Study of oxygen-containing compounds' },
-    { name: 'Aldehydes and Ketones', code: 'ALDEHYDES_KETONES', description: 'Study of carbonyl compounds' },
-    { name: 'Carboxylic Acids', code: 'CARBOXYLIC_ACIDS', description: 'Study of organic acids' },
-    { name: 'Amines', code: 'AMINES', description: 'Study of nitrogen-containing compounds' },
-  ],
+  
+  // Biology subtopics
   BOTANY: [
     { name: 'Plant Anatomy', code: 'PLANT_ANATOMY', description: 'Study of plant structure and organization' },
     { name: 'Plant Physiology', code: 'PLANT_PHYSIOLOGY', description: 'Study of plant functions and processes' },
@@ -318,173 +206,122 @@ const neetSubtopics = {
     { name: 'Genetic Disorders', code: 'GENETIC_DISORDERS', description: 'Study of inherited diseases' },
     { name: 'Genetic Engineering', code: 'GENETIC_ENGINEERING', description: 'Study of DNA manipulation' },
   ],
+  ECOLOGY: [
+    { name: 'Population Ecology', code: 'POPULATION_ECOLOGY', description: 'Study of population dynamics' },
+    { name: 'Community Ecology', code: 'COMMUNITY_ECOLOGY', description: 'Study of species interactions' },
+    { name: 'Ecosystem Ecology', code: 'ECOSYSTEM_ECOLOGY', description: 'Study of energy and nutrient flow' },
+    { name: 'Conservation Biology', code: 'CONSERVATION_BIOLOGY', description: 'Study of biodiversity protection' },
+    { name: 'Environmental Biology', code: 'ENVIRONMENTAL_BIOLOGY', description: 'Study of human impact on environment' },
+  ],
 };
 
 export async function seedJeeNeetContent() {
   try {
     await dbConnect();
-    console.log('🌱 Seeding JEE and NEET exams with comprehensive content...');
+    console.log('🌱 Seeding JEE and NEET content...');
 
-    // Create exams
-    const createdExams: { [key: string]: IExam } = {};
+    // Get existing exams
+    const jeeExam = await Exam.findOne({ code: 'JEE' });
+    const neetExam = await Exam.findOne({ code: 'NEET' });
     
-    for (const exam of examData) {
-      try {
-        const createdExam = await createExam(exam);
-        createdExams[exam.code] = createdExam;
-        console.log(`✅ Created exam: ${exam.name}`);
-      } catch (error: unknown) {
-        const err = error as { code?: number };
-        if (err.code === 11000) {
-          console.log(`⏭️  Exam ${exam.name} already exists, fetching...`);
-          const existingExam = await Exam.findOne({ code: exam.code });
-          if (existingExam) {
-            createdExams[exam.code] = existingExam;
+    if (!jeeExam || !neetExam) {
+      throw new Error('JEE and NEET exams must be created first. Please run seed-exams.ts');
+    }
+
+    const createdExams = { JEE: jeeExam, NEET: neetExam };
+
+    // Define exam-subject mappings
+    const examSubjects = {
+      JEE: ['PHYSICS', 'CHEMISTRY', 'MATHEMATICS'],
+      NEET: ['PHYSICS', 'CHEMISTRY', 'BIOLOGY'],
+    };
+
+    // Create subjects for each exam
+    const createdSubjects: { [examCode: string]: { [subjectCode: string]: ISubject } } = {
+      JEE: {},
+      NEET: {},
+    };
+
+    for (const [examCode, subjectCodes] of Object.entries(examSubjects)) {
+      for (const subjectCode of subjectCodes) {
+        const subjectData = subjects[subjectCode as keyof typeof subjects];
+        if (!subjectData) continue;
+
+        try {
+          const createdSubject = await createSubject({
+            ...subjectData,
+            exam: createdExams[examCode as keyof typeof createdExams]._id,
+          });
+          createdSubjects[examCode][subjectCode] = createdSubject;
+          console.log(`✅ Created ${examCode} subject: ${subjectData.name}`);
+        } catch (error: unknown) {
+          const err = error as { code?: number };
+          if (err.code === 11000) {
+            console.log(`⏭️  ${examCode} subject ${subjectData.name} already exists, skipping...`);
+          } else {
+            console.error(`❌ Error creating ${examCode} subject ${subjectData.name}:`, error);
           }
-        } else {
-          console.error(`❌ Error creating exam ${exam.name}:`, error);
-          return;
         }
       }
     }
 
-    // Create subjects for JEE
-    const jeeSubjectsCreated: { [key: string]: ISubject } = {};
-    for (const subject of jeeSubjects) {
-      try {
-        const createdSubject = await createSubject({
-          ...subject,
-          exam: createdExams['JEE']._id,
-        });
-        jeeSubjectsCreated[subject.code] = createdSubject;
-        console.log(`✅ Created JEE subject: ${subject.name}`);
-      } catch (error: unknown) {
-        const err = error as { code?: number };
-        if (err.code === 11000) {
-          console.log(`⏭️  JEE subject ${subject.name} already exists, skipping...`);
-        } else {
-          console.error(`❌ Error creating JEE subject ${subject.name}:`, error);
-        }
-      }
-    }
+    // Create topics for each exam
+    const createdTopics: { [examCode: string]: { [topicCode: string]: ITopic } } = {
+      JEE: {},
+      NEET: {},
+    };
 
-    // Create subjects for NEET
-    const neetSubjectsCreated: { [key: string]: ISubject } = {};
-    for (const subject of neetSubjects) {
-      try {
-        const createdSubject = await createSubject({
-          ...subject,
-          exam: createdExams['NEET']._id,
-        });
-        neetSubjectsCreated[subject.code] = createdSubject;
-        console.log(`✅ Created NEET subject: ${subject.name}`);
-      } catch (error: unknown) {
-        const err = error as { code?: number };
-        if (err.code === 11000) {
-          console.log(`⏭️  NEET subject ${subject.name} already exists, skipping...`);
-        } else {
-          console.error(`❌ Error creating NEET subject ${subject.name}:`, error);
-        }
-      }
-    }
+    for (const [examCode, subjectCodes] of Object.entries(examSubjects)) {
+      for (const subjectCode of subjectCodes) {
+        const subject = createdSubjects[examCode][subjectCode];
+        if (!subject) continue;
 
-    // Create topics for JEE
-    const jeeTopicsCreated: { [key: string]: ITopic } = {};
-    for (const [subjectCode, topics] of Object.entries(jeeTopics)) {
-      const subject = jeeSubjectsCreated[subjectCode];
-      if (subject) {
-        for (const topic of topics) {
+        const topicList = topics[subjectCode as keyof typeof topics];
+        if (!topicList) continue;
+
+        for (const topic of topicList) {
           try {
             const createdTopic = await createTopic({
               ...topic,
               subject: subject._id,
             });
-            jeeTopicsCreated[topic.code] = createdTopic;
-            console.log(`✅ Created JEE topic: ${topic.name}`);
+            createdTopics[examCode][topic.code] = createdTopic;
+            console.log(`✅ Created ${examCode} topic: ${topic.name}`);
           } catch (error: unknown) {
             const err = error as { code?: number };
             if (err.code === 11000) {
-              console.log(`⏭️  JEE topic ${topic.name} already exists, skipping...`);
+              console.log(`⏭️  ${examCode} topic ${topic.name} already exists, skipping...`);
             } else {
-              console.error(`❌ Error creating JEE topic ${topic.name}:`, error);
+              console.error(`❌ Error creating ${examCode} topic ${topic.name}:`, error);
             }
           }
         }
       }
     }
 
-    // Create topics for NEET
-    const neetTopicsCreated: { [key: string]: ITopic } = {};
-    for (const [subjectCode, topics] of Object.entries(neetTopics)) {
-      const subject = neetSubjectsCreated[subjectCode];
-      if (subject) {
-        for (const topic of topics) {
-          try {
-            const createdTopic = await createTopic({
-              ...topic,
-              subject: subject._id,
-            });
-            neetTopicsCreated[topic.code] = createdTopic;
-            console.log(`✅ Created NEET topic: ${topic.name}`);
-          } catch (error: unknown) {
-            const err = error as { code?: number };
-            if (err.code === 11000) {
-              console.log(`⏭️  NEET topic ${topic.name} already exists, skipping...`);
-            } else {
-              console.error(`❌ Error creating NEET topic ${topic.name}:`, error);
-            }
-          }
-        }
-      }
-    }
+    // Create subtopics for each exam
+    for (const [examCode, subjectCodes] of Object.entries(examSubjects)) {
+      for (const subjectCode of subjectCodes) {
+        const topicList = topics[subjectCode as keyof typeof topics];
+        if (!topicList) continue;
 
-    // Create subtopics for JEE with nested structure
-    const createdSubtopics: { [key: string]: ISubtopic } = {};
-    
-    // First pass: Create all first-level subtopics (children of topics)
-    for (const [topicCode, subtopics] of Object.entries(jeeSubtopics)) {
-      const topic = jeeTopicsCreated[topicCode];
-      if (topic) {
-        for (const subtopic of subtopics) {
-          try {
-            const createdSubtopic = await createSubtopic({
-              ...subtopic,
-              topic: topic._id,
-            });
-            createdSubtopics[subtopic.code] = createdSubtopic;
-            console.log(`✅ Created JEE first-level subtopic: ${subtopic.name}`);
-          } catch (error: unknown) {
-            const err = error as { code?: number };
-            if (err.code === 11000) {
-              console.log(`⏭️  JEE first-level subtopic ${subtopic.name} already exists, skipping...`);
-            } else {
-              console.error(`❌ Error creating JEE first-level subtopic ${subtopic.name}:`, error);
-            }
-          }
-        }
-      }
-    }
-    
-    // Second pass: Create nested subtopics (children of subtopics)
-    for (const [parentCode, subtopics] of Object.entries(jeeSubtopics)) {
-      // Skip topics (only process subtopics that have children)
-      if (!jeeTopicsCreated[parentCode]) {
-        const parentSubtopic = createdSubtopics[parentCode];
-        if (parentSubtopic) {
-          for (const subtopic of subtopics) {
+        for (const topic of topicList) {
+          const subtopicList = subtopics[topic.code as keyof typeof subtopics];
+          if (!subtopicList) continue;
+
+          for (const subtopic of subtopicList) {
             try {
               await createSubtopic({
                 ...subtopic,
-                topic: parentSubtopic.topic, // Same topic as parent
-                parentSubtopic: parentSubtopic._id,
+                topic: createdTopics[examCode][topic.code]._id,
               });
-              console.log(`✅ Created JEE nested subtopic: ${subtopic.name} under ${parentCode}`);
+              console.log(`✅ Created ${examCode} subtopic: ${subtopic.name}`);
             } catch (error: unknown) {
               const err = error as { code?: number };
               if (err.code === 11000) {
-                console.log(`⏭️  JEE nested subtopic ${subtopic.name} already exists, skipping...`);
+                console.log(`⏭️  ${examCode} subtopic ${subtopic.name} already exists, skipping...`);
               } else {
-                console.error(`❌ Error creating JEE nested subtopic ${subtopic.name}:`, error);
+                console.error(`❌ Error creating ${examCode} subtopic ${subtopic.name}:`, error);
               }
             }
           }
@@ -492,61 +329,7 @@ export async function seedJeeNeetContent() {
       }
     }
 
-    // Create subtopics for NEET with nested structure
-    const createdNeetSubtopics: { [key: string]: ISubtopic } = {};
-    
-    // First pass: Create all first-level subtopics (children of topics)
-    for (const [topicCode, subtopics] of Object.entries(neetSubtopics)) {
-      const topic = neetTopicsCreated[topicCode];
-      if (topic) {
-        for (const subtopic of subtopics) {
-          try {
-            const createdSubtopic = await createSubtopic({
-              ...subtopic,
-              topic: topic._id,
-            });
-            createdNeetSubtopics[subtopic.code] = createdSubtopic;
-            console.log(`✅ Created NEET first-level subtopic: ${subtopic.name}`);
-          } catch (error: unknown) {
-            const err = error as { code?: number };
-            if (err.code === 11000) {
-              console.log(`⏭️  NEET first-level subtopic ${subtopic.name} already exists, skipping...`);
-            } else {
-              console.error(`❌ Error creating NEET first-level subtopic ${subtopic.name}:`, error);
-            }
-          }
-        }
-      }
-    }
-    
-    // Second pass: Create nested subtopics (children of subtopics)
-    for (const [parentCode, subtopics] of Object.entries(neetSubtopics)) {
-      // Skip topics (only process subtopics that have children)
-      if (!neetTopicsCreated[parentCode]) {
-        const parentSubtopic = createdNeetSubtopics[parentCode];
-        if (parentSubtopic) {
-          for (const subtopic of subtopics) {
-            try {
-              await createSubtopic({
-                ...subtopic,
-                topic: parentSubtopic.topic, // Same topic as parent
-                parentSubtopic: parentSubtopic._id,
-              });
-              console.log(`✅ Created NEET nested subtopic: ${subtopic.name} under ${parentCode}`);
-            } catch (error: unknown) {
-              const err = error as { code?: number };
-              if (err.code === 11000) {
-                console.log(`⏭️  NEET nested subtopic ${subtopic.name} already exists, skipping...`);
-              } else {
-                console.error(`❌ Error creating NEET nested subtopic ${subtopic.name}:`, error);
-              }
-            }
-          }
-        }
-      }
-    }
-
-    console.log('✅ JEE and NEET content seeding completed successfully!');
+    console.log('✅ JEE and NEET content seeding completed');
   } catch (error) {
     console.error('❌ Error seeding JEE and NEET content:', error);
     throw error;
@@ -557,11 +340,11 @@ export async function seedJeeNeetContent() {
 if (require.main === module) {
   seedJeeNeetContent()
     .then(() => {
-      console.log('🎉 JEE and NEET content seeding completed successfully');
+      console.log('🎉 Seeding completed successfully');
       process.exit(0);
     })
     .catch((error) => {
-      console.error('💥 JEE and NEET content seeding failed:', error);
+      console.error('💥 Seeding failed:', error);
       process.exit(1);
     });
 } 

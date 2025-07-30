@@ -1,12 +1,13 @@
 "use client";
 
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useSpeechToText } from "@/features/speech-recognition/useSpeechToText";
 
 import { toast } from 'sonner';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { useCreatePracticeSession } from '@/features/db/hooks/useCreatePracticeSession';
 import { Mic, Square, Send } from 'lucide-react';
 
 const PracticeClientPage = () => {
@@ -19,21 +20,65 @@ const PracticeClientPage = () => {
   const keyPoints = searchParams.get('keyPoints'); // Get keyPoints from search params
 
   const { transcript, listening, startListening, stopListening } = useSpeechToText();
+  const [sessionId, setSessionId] = useState<string | null>(null);
+  const [sessionStartTime, setSessionStartTime] = useState<number | null>(null);
+
+  const { mutate: createPracticeSession } = useCreatePracticeSession();
 
   useEffect(() => {
     if (!topic || !exam || !subject) {
       toast.error("Missing topic, exam, or subject. Redirecting to select-topic page.");
       router.replace('/select-topic');
+    } else {
+      // Create a practice session when the component mounts
+      createPracticeSession({
+        topic,
+        exam,
+        subject,
+        subtopic,
+        concept: subtopic
+      }, {
+        onSuccess: (data) => {
+          setSessionId(data.sessionId);
+          setSessionStartTime(Date.now());
+        }
+      });
     }
-  }, [topic, exam, subject, router]);
+  }, [topic, exam, subject, subtopic, router, createPracticeSession]);
 
   const handleSubmitExplanation = async () => {
     if (!transcript.trim()) {
       toast.error("Please record your explanation before submitting.");
       return;
     }
-    // Pass keyPoints and subtopic to the analysis page
-    const analysisParams = `exam=${exam}&subject=${subject}&topic=${topic}&transcript=${encodeURIComponent(transcript)}`;
+
+    // Calculate session duration
+    const duration = sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : 0;
+
+    // Update the practice session with transcript and duration
+    if (sessionId) {
+      try {
+        await fetch('/api/practice-sessions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            action: 'update',
+            sessionId,
+            updateData: {
+              transcript,
+              duration
+            }
+          })
+        });
+      } catch (error) {
+        console.error('Error updating practice session:', error);
+      }
+    }
+
+    // Pass keyPoints, subtopic, sessionId, and duration to the analysis page
+    const analysisParams = `exam=${exam}&subject=${subject}&topic=${topic}&transcript=${encodeURIComponent(transcript)}&sessionId=${sessionId}&duration=${duration}`;
     const keyPointsParam = keyPoints ? `&keyPoints=${keyPoints}` : '';
     const subtopicParam = subtopic ? `&subtopic=${encodeURIComponent(subtopic)}` : '';
     router.push(`/analysis?${analysisParams}${keyPointsParam}${subtopicParam}`);
@@ -84,40 +129,22 @@ const PracticeClientPage = () => {
                 </p>
               </div>
 
-              <div className="bg-gray-800/50 rounded-xl p-6 min-h-48 border border-gray-700">
-                <h3 className="text-white font-semibold mb-4 flex items-center gap-2">
-                  <Mic className="h-4 w-4" />
-                  Your Explanation:
-                </h3>
-                <div className="text-gray-200 text-lg leading-relaxed">
-                  {transcript || (
-                    <span className="text-gray-500 italic">
-                      Your words will appear here as you speak...
-                    </span>
-                  )}
-                  {listening && <span className="animate-pulse">|</span>}
+                <div className="space-y-4">
+                  <div className="bg-gray-800/50 rounded-lg p-4">
+                    <h3 className="text-lg font-semibold text-white mb-2">Your Explanation:</h3>
+                    <p className="text-gray-300 leading-relaxed">{transcript}</p>
+                  </div>
+                  
+                  <div className="flex justify-center">
+                    <Button
+                      onClick={handleSubmitExplanation}
+                      className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 text-lg"
+                    >
+                      <Send className="h-5 w-5 mr-2" />
+                      Submit for Analysis
+                    </Button>
+                  </div>
                 </div>
-              </div>
-
-              <div className="flex gap-4">
-                <Button
-                  onClick={handleSubmitExplanation}
-                  disabled={!transcript.trim()}
-                  className={`w-full h-12 bg-green-600 hover:bg-green-700 disabled:opacity-50`}
-                >
-                  {listening ? (
-                    <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                      Analyzing...
-                    </>
-                  ) : (
-                    <>
-                      <Send className="h-4 w-4 mr-2" />
-                      Get My Analysis
-                    </>
-                  )}
-                </Button>
-              </div>
             </div>
           </CardContent>
         </Card>

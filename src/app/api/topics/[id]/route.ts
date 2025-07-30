@@ -3,10 +3,10 @@ import { getTopicById } from '@/features/db/data/topics';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const topicId = params.id;
+    const { id: topicId } = await params;
 
     console.log('Topics API called with topicId:', topicId);
 

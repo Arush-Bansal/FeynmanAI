@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
-import { authOptions } from '../auth/[...nextauth]/route';
+import { authOptions } from '@/lib/auth';
 import { updateUserPreferences } from '@/features/db/data/users';
 import { getExamByCode } from '@/features/db/data/exams';
 import dbConnect from '@/features/db/dbConnect';
